@@ -479,7 +479,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!95 &1551350626 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: dd34d2a177e5313468a9f3c1b539f404, type: 3}
@@ -499,6 +499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   walkSpeed: 3
   runSpeed: 6
+  rotationSpeed: 10
   controller: {fileID: 1551350625}
   animator: {fileID: 1551350626}
 --- !u!1 &1615942065
