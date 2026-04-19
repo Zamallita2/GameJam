@@ -12,7 +12,15 @@ public class MachineGlow : MonoBehaviour
 
     void Start()
     {
-        rend = GetComponent<Renderer>();
+        rend = GetComponentInChildren<Renderer>();
+
+        if (rend == null)
+        {
+            Debug.LogWarning("No se encontró Renderer en " + gameObject.name);
+            enabled = false;
+            return;
+        }
+
         rend.material.EnableKeyword("_EMISSION");
     }
 
