@@ -1,0 +1,6 @@
+newmtl tripo_material_f5729f5e_642a_490d_a81e_5d69ce4ff2c3
+Kd 1.000000000 1.000000000 1.000000000
+d 1.000000000
+illum 2
+map_Kd reactor_basecolor.jpg
+
