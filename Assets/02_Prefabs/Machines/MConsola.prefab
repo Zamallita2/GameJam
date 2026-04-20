@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5126188349809933470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 109145253412807493}
+  - component: {fileID: 4820500810435936636}
+  - component: {fileID: 8250643105522299950}
+  m_Layer: 0
+  m_Name: MConsola
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &109145253412807493
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126188349809933470}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.14190996, y: 0.58925, z: -10.2528105}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2671998753559989286}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4820500810435936636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126188349809933470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c978c15d6ac71f47a82585188d2e64c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MachineInteraction
+  panelRoot: {fileID: 0}
+  panelCamera: {fileID: 0}
+  playerCamera: {fileID: 0}
+  player: {fileID: 0}
+  interactKey: 101
+  interactionDistance: 3
+--- !u!114 &8250643105522299950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5126188349809933470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd502f5de09a3be4586ba75959f671ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MachineGlow
+  glowColor: {r: 1, g: 0, b: 0, a: 1}
+  speed: 0.7
+  intensity: 2
+--- !u!1001 &2494538758931065805
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 109145253412807493}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.00018000603
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.30714005
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.00023007393
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      propertyPath: m_Name
+      value: consola
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6845366539424908256}
+  m_SourcePrefab: {fileID: 100100000, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+--- !u!4 &2671998753559989286 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+  m_PrefabInstance: {fileID: 2494538758931065805}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3341398352948008604 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c211a3418dac8a439830e624a87414a, type: 3}
+  m_PrefabInstance: {fileID: 2494538758931065805}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &6845366539424908256
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3341398352948008604}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.61424816, y: 0.5212545, z: 1}
+  m_Center: {x: -0.01377672, y: -0.0017221272, z: 0}
