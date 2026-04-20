@@ -303,6 +303,7 @@ MonoBehaviour:
   gravity: -9.81
   mouseSensitivity: 200
   cameraPivot: {fileID: 806995379}
+  armsAnimator: {fileID: 236042488}
 --- !u!1001 &565244071
 PrefabInstance:
   m_ObjectHideFlags: 0

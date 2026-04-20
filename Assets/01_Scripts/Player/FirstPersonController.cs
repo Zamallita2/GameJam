@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FirstPersonController : MonoBehaviour
 {
@@ -15,6 +15,9 @@ public class FirstPersonController : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 velocity;
+
+    [Header("Animator")]
+    public Animator armsAnimator;
 
     void Start()
     {
@@ -61,5 +64,28 @@ public class FirstPersonController : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // 🔥 CALCULAR VELOCIDAD PARA ANIMACIONES
+        float inputMagnitude = new Vector2(h, v).magnitude;
+
+        float animSpeed = 0f;
+
+        if (inputMagnitude > 0.1f)
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+                animSpeed = 1f;      // correr
+            else
+                animSpeed = 0.5f;   // caminar
+        }
+        else
+        {
+            animSpeed = 0f;         // idle
+        }
+
+        // 🔥 ENVIAR AL ANIMATOR
+        if (armsAnimator != null)
+        {
+            armsAnimator.SetFloat("Speed", animSpeed);
+        }
     }
 }
