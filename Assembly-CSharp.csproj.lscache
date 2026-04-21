@@ -2,12 +2,10 @@ version=1
 
 # This file caches language service data to improve the performance of C# Dev Kit.
 # It is not intended for manual editing. It can safely be deleted and will be
-# regenerated automatically.
+# regenerated automatically. For more information, see https://aka.ms/lscache
 #
-# To exclude from version control, add *.lscache to your .gitignore file.
-#
-# To disable caching, add the following to your VS Code settings:
-#   "dotnet.projectsystem.enableLanguageServiceCache": false
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
 
 [project]
 language=C#
@@ -53,6 +51,7 @@ TemporaryDependencyNodeTargetIdentifier=netstandard2.1
 
 [sourceFiles]
 Assets/01_Scripts/Machine/
+ HandManager.cs
  MachineGlow.cs
  MachineInteraction.cs
  MachineType.cs
@@ -65,18 +64,18 @@ Assets/01_Scripts/Menu/
  MenuMusicManager.cs
  MenuSceneManager.cs
 Assets/01_Scripts/PanelFallas/
- CableNode.cs
- FallaBotonesManager.cs
- FallaCablesManager.cs
- FallaPalancasManager.cs
  FitObjectToCamera.cs
  PanelBase.cs
  PanelDefinition.cs
  PanelLoader.cs
- PuzzleButton.cs
- PuzzleLevelManager.cs
- PuzzleLever.cs
+ SimonButton3D.cs
+ SimonButtonsPanel.cs
+ StatusLamp.cs
 Assets/01_Scripts/Player/
+ ArmsBobbing.cs
+ ArmsController.cs
+ FirstPersonController.cs
+ MouseLook.cs
  PlayerCameraController.cs
  PlayerMovement.cs
 Assets/

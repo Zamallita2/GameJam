@@ -15,6 +15,7 @@ public class MachineInteraction : MonoBehaviour
     private bool panelActivo = false;
     private MachineType machineType;
     private PanelLoader panelLoader;
+    private HandManager handManager;
 
     void Awake()
     {
@@ -52,6 +53,9 @@ public class MachineInteraction : MonoBehaviour
 
             if (panelLoader == null)
                 panelLoader = panelRoot.GetComponentInChildren<PanelLoader>(true);
+
+            if (handManager == null)
+                handManager = FindFirstObjectByType<HandManager>();
         }
     }
 
@@ -66,11 +70,15 @@ public class MachineInteraction : MonoBehaviour
         if (playerNear && Input.GetKeyDown(interactKey) && !panelActivo)
         {
             ActivarPanel();
+            if (handManager != null)
+                handManager.Activar();
         }
 
         if (panelActivo && Input.GetKeyDown(KeyCode.Escape))
         {
             DesactivarPanel();
+            if (handManager != null)
+                handManager.Desactivar();
         }
     }
 
