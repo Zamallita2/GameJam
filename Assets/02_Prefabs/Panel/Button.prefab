@@ -121,7 +121,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5792743221562503835}
-  - component: {fileID: 422013307662061883}
   - component: {fileID: 4767425379956601579}
   m_Layer: 0
   m_Name: Button
@@ -146,27 +145,6 @@ Transform:
   - {fileID: 3807487051686087888}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &422013307662061883
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8631082403856760745}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.9796343, y: 1.0203667, z: 0.6945149}
-  m_Center: {x: -3.9203901, y: -2.0671139, z: -0.0916456}
 --- !u!114 &4767425379956601579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,6 +165,9 @@ MonoBehaviour:
   pressTarget: {fileID: 4681864144241456744}
   pressDepth: 0.02
   pressSpeed: 10
+  audioSource: {fileID: 0}
+  clickSound: {fileID: 0}
+  clickVolume: 1
 --- !u!1001 &3700921167525931835
 PrefabInstance:
   m_ObjectHideFlags: 0

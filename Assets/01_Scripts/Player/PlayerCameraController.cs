@@ -22,7 +22,7 @@ public class PlayerCameraController : MonoBehaviour
     public KeyCode switchViewKey = KeyCode.V;
     public bool startInThirdPerson = true;
 
-    [Header("Colisión Cámara")]
+    [Header("Colisiï¿½n Cï¿½mara")]
     public float cameraCollisionRadius = 0.15f;
     public float minDistance = 0.25f;
     public LayerMask collisionMask;
