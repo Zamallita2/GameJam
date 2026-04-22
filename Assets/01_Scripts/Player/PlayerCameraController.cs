@@ -126,4 +126,9 @@ public class PlayerCameraController : MonoBehaviour
 
         return desiredPosition;
     }
+
+    public bool IsThirdPerson()
+    {
+        return isThirdPerson;
+    }
 }
