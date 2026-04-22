@@ -22,7 +22,7 @@ public class SimonButton3D : MonoBehaviour
     [Header("Sonido")]
     public AudioSource audioSource;
     public AudioClip clickSound;
-    public float clickVolume = 1f;
+    [Range(0f, 1f)] public float clickVolume = 1f;
 
     private SimonButtonsPanel manager;
     private Vector3 initialLocalPos;
@@ -53,7 +53,7 @@ public class SimonButton3D : MonoBehaviour
         SetInactive();
     }
 
-    void OnMouseDown()
+    public void TriggerPress()
     {
         Debug.Log("Click en botón ID: " + buttonId);
 

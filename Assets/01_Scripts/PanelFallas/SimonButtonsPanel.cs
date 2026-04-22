@@ -34,6 +34,10 @@ public class SimonButtonsPanel : MonoBehaviour
     public AudioClip correctSound;
     public AudioClip wrongSound;
 
+    [Header("Click")]
+    public Camera inputCamera;
+    public LayerMask buttonLayerMask = ~0;
+
     private readonly List<int> sequence = new List<int>();
     private int currentInputIndex = 0;
 
@@ -48,6 +52,9 @@ public class SimonButtonsPanel : MonoBehaviour
 
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
+
+        if (inputCamera == null)
+            inputCamera = Camera.main;
     }
 
     void Start()
@@ -55,6 +62,33 @@ public class SimonButtonsPanel : MonoBehaviour
         if (iniciarAutomaticamente)
         {
             Setup(nivelPrueba);
+        }
+    }
+
+    void Update()
+    {
+        if (!canPlay || isShowingSequence)
+            return;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (inputCamera == null)
+                inputCamera = Camera.main;
+
+            if (inputCamera == null)
+                return;
+
+            Ray ray = inputCamera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, buttonLayerMask))
+            {
+                SimonButton3D clickedButton = hit.collider.GetComponentInParent<SimonButton3D>();
+
+                if (clickedButton != null)
+                {
+                    clickedButton.TriggerPress();
+                }
+            }
         }
     }
 
