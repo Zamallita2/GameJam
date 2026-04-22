@@ -538,7 +538,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Button (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 422013307662061883, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -623,7 +624,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Button (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 422013307662061883, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -712,6 +714,10 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   correctSound: {fileID: 8300000, guid: 7abead20eba2cef479648adb57efc64f, type: 3}
   wrongSound: {fileID: 8300000, guid: d59b6ed3dacbd764dbb317a6c86b5f99, type: 3}
+  inputCamera: {fileID: 408266507}
+  buttonLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!4 &1701251740 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5792743221562503835, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
@@ -870,7 +876,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Button (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 422013307662061883, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -898,6 +905,10 @@ PrefabInstance:
     - target: {fileID: 422013307662061883, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
       propertyPath: m_Center.y
       value: -2.0583458
+      objectReference: {fileID: 0}
+    - target: {fileID: 642839536792428597, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4767425379956601579, guid: c22a99d800ec2f444a35e49dc606ccd7, type: 3}
       propertyPath: clickSound
