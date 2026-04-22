@@ -55,6 +55,9 @@ Assets/01_Scripts/Machine/
  MachineGlow.cs
  MachineInteraction.cs
  MachineType.cs
+ Wire/
+  CableNode.cs
+  CablesPanel.cs
 Assets/01_Scripts/Map/
  Movement.cs
  TimeManager.cs
@@ -63,6 +66,13 @@ Assets/01_Scripts/Menu/
  GlowPulse.cs
  MenuMusicManager.cs
  MenuSceneManager.cs
+Assets/01_Scripts/PanelFallas/Arrows/
+ ArrowObject.cs
+ ArrowSpawner.cs
+ FastInputButton3D.cs
+ FastInputPanelController.cs
+ FastInputPrompt3D.cs
+ StatusLampa.cs
 Assets/01_Scripts/PanelFallas/
  FitObjectToCamera.cs
  PanelBase.cs
@@ -141,7 +151,6 @@ Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
  UnityEditor.VideoModule.dll
  UnityEditor.XRModule.dll
  UnityEngine.AccessibilityModule.dll
- UnityEngine.AdaptivePerformanceModule.dll
  UnityEngine.AIModule.dll
  UnityEngine.AndroidJNIModule.dll
  UnityEngine.AnimationModule.dll
@@ -209,7 +218,6 @@ Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
  UnityEngine.UnityWebRequestModule.dll
  UnityEngine.UnityWebRequestTextureModule.dll
  UnityEngine.UnityWebRequestWWWModule.dll
- UnityEngine.VectorGraphicsModule.dll
  UnityEngine.VehiclesModule.dll
  UnityEngine.VFXModule.dll
  UnityEngine.VideoModule.dll
