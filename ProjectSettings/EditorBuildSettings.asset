@@ -14,6 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/00_Scenes/Game.unity
     guid: eb0d8e3b71e0d054b9df9133ecf061da
+  - enabled: 1
+    path: Assets/00_Scenes/CarlaMinijuego/Menu.unity
+    guid: 56bc819b0165234408abc08bb026b642
+  - enabled: 1
+    path: Assets/00_Scenes/CarlaMinijuego/Juego.unity
+    guid: 52130c53bde1ae048a92e73e02a4a942
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
