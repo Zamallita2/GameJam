@@ -1,36 +1,34 @@
 using System.Collections;
 using UnityEngine;
 
-public class FastInputButton3D : MonoBehaviour
+public class KeyButtonController : MonoBehaviour
 {
-    public enum ColorSymbol
+    public enum KeySymbol
     {
-        Red,
-        Blue,
-        Green,
-        Pink
+        A,
+        S,
+        D,
+        F
     }
 
-    public enum ButtonVisualType
-    {
-        Arrow,
-        Circle
-    }
+    [Header("Tecla")]
+    public KeySymbol keySymbol;
+    public KeyCode keyCode;
 
-    [Header("Identidad lógica")]
-    public ColorSymbol symbol;
-    public ButtonVisualType buttonType;
+    [Header("Botón")]
+    public Transform pressTarget;
+    public float pressDepth = 0.01f;
+    public float pressSpeed = 12f;
 
-    [Header("Visual")]
+    [Header("Renderer")]
     public Renderer targetRenderer;
     public Material idleMaterial;
     public Material pressedMaterial;
     public Material errorMaterial;
 
-    [Header("Animación")]
-    public Transform pressTarget;
-    public float pressDepth = 0.01f;
-    public float pressSpeed = 12f;
+    [Header("Luz")]
+    public Light keyLight;
+    public float lightDuration = 0.15f;
 
     [Header("Sonido")]
     public AudioSource audioSource;
@@ -40,13 +38,13 @@ public class FastInputButton3D : MonoBehaviour
     private Vector3 initialLocalPos;
     private bool isAnimating = false;
 
-    void Awake()
+    void Start()
     {
-        if (targetRenderer == null)
-            targetRenderer = GetComponentInChildren<Renderer>();
-
         if (pressTarget == null)
             pressTarget = transform;
+
+        if (targetRenderer == null)
+            targetRenderer = GetComponentInChildren<Renderer>();
 
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
@@ -55,6 +53,10 @@ public class FastInputButton3D : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
 
         initialLocalPos = pressTarget.localPosition;
+
+        if (keyLight != null)
+            keyLight.enabled = false;
+
         SetIdle();
     }
 
@@ -76,28 +78,21 @@ public class FastInputButton3D : MonoBehaviour
             targetRenderer.material = errorMaterial;
     }
 
-    public void TriggerVisualPress()
+    public void TriggerCorrectFeedback()
     {
         if (!isAnimating)
             StartCoroutine(PressRoutine());
+
+        StartCoroutine(LightRoutine());
+        StartCoroutine(PressedRoutine());
 
         if (audioSource != null && pressSound != null)
             audioSource.PlayOneShot(pressSound, volume);
     }
 
-    public IEnumerator FlashPressed(float duration)
+    public void TriggerWrongFeedback()
     {
-        SetPressed();
-        TriggerVisualPress();
-        yield return new WaitForSeconds(duration);
-        SetIdle();
-    }
-
-    public IEnumerator FlashError(float duration)
-    {
-        SetError();
-        yield return new WaitForSeconds(duration);
-        SetIdle();
+        StartCoroutine(ErrorRoutine());
     }
 
     IEnumerator PressRoutine()
@@ -124,5 +119,36 @@ public class FastInputButton3D : MonoBehaviour
 
         pressTarget.localPosition = initialLocalPos;
         isAnimating = false;
+    }
+
+    IEnumerator LightRoutine()
+    {
+        if (keyLight == null) yield break;
+
+        keyLight.enabled = true;
+        yield return new WaitForSeconds(lightDuration);
+        keyLight.enabled = false;
+    }
+
+    IEnumerator PressedRoutine()
+    {
+        SetPressed();
+        yield return new WaitForSeconds(0.12f);
+        SetIdle();
+    }
+
+    IEnumerator ErrorRoutine()
+    {
+        SetError();
+
+        if (keyLight != null)
+            keyLight.enabled = true;
+
+        yield return new WaitForSeconds(0.2f);
+
+        if (keyLight != null)
+            keyLight.enabled = false;
+
+        SetIdle();
     }
 }

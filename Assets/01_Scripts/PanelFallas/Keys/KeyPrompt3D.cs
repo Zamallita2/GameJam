@@ -1,32 +1,23 @@
 using UnityEngine;
 
-public class FastInputPrompt3D : MonoBehaviour
+public class KeyPrompt3D : MonoBehaviour
 {
-    public enum PromptType
-    {
-        Arrow,
-        Circle
-    }
-
-    public FastInputButton3D.ColorSymbol symbol;
-    public PromptType promptType;
+    public KeyButtonController.KeySymbol keySymbol;
     public Renderer targetRenderer;
 
     private Transform missPoint;
     private float moveSpeed;
-    private FastInputPanelController controller;
+    private KeyboardMinigameController controller;
     private bool wasResolved = false;
 
     public void Init(
-        FastInputButton3D.ColorSymbol newSymbol,
-        PromptType newType,
+        KeyButtonController.KeySymbol newSymbol,
         Material visualMaterial,
         Transform newMissPoint,
         float newMoveSpeed,
-        FastInputPanelController newController)
+        KeyboardMinigameController newController)
     {
-        symbol = newSymbol;
-        promptType = newType;
+        keySymbol = newSymbol;
         missPoint = newMissPoint;
         moveSpeed = newMoveSpeed;
         controller = newController;
@@ -36,13 +27,6 @@ public class FastInputPrompt3D : MonoBehaviour
 
         if (targetRenderer != null && visualMaterial != null)
             targetRenderer.material = visualMaterial;
-
-        // Solo flechas rotan aleatoriamente
-        if (promptType == PromptType.Arrow)
-        {
-            float angle = Random.Range(0, 4) * 90f;
-            transform.Rotate(Vector3.forward, angle);
-        }
     }
 
     void Update()
@@ -56,7 +40,7 @@ public class FastInputPrompt3D : MonoBehaviour
             moveSpeed * Time.deltaTime
         );
 
-        if (Vector3.Distance(transform.position, missPoint.position) <= 0.08f)
+        if (Vector3.Distance(transform.position, missPoint.position) <= 0.06f)
         {
             if (controller != null)
                 controller.OnPromptMissed(this);
