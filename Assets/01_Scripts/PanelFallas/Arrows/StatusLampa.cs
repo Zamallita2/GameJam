@@ -1,10 +1,8 @@
-using System.Collections;
 using UnityEngine;
 
 public class StatusLampa : MonoBehaviour
 {
     public Renderer lampRenderer;
-
     public Material neutralMaterial;
     public Material correctMaterial;
     public Material wrongMaterial;
@@ -31,19 +29,5 @@ public class StatusLampa : MonoBehaviour
     {
         if (lampRenderer != null && wrongMaterial != null)
             lampRenderer.material = wrongMaterial;
-    }
-
-    public IEnumerator FlashWrong(float duration)
-    {
-        SetWrong();
-        yield return new WaitForSeconds(duration);
-        SetNeutral();
-    }
-
-    public IEnumerator FlashCorrect(float duration)
-    {
-        SetCorrect();
-        yield return new WaitForSeconds(duration);
-        SetNeutral();
     }
 }
