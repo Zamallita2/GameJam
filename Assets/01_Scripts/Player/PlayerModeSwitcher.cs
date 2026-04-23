@@ -6,6 +6,7 @@ public class PlayerModeSwitcher : MonoBehaviour
     public GameObject firstPersonPlayer;
 
     private bool isFirstPerson = false;
+    public PlayerMovement playerMovement;
 
     void Start()
     {
@@ -27,31 +28,18 @@ public class PlayerModeSwitcher : MonoBehaviour
 
     void ActivateFirstPerson()
     {
-        Vector3 pos = thirdPersonPlayer.transform.position;
-
-        firstPersonPlayer.transform.position = pos;
-        firstPersonPlayer.transform.rotation = thirdPersonPlayer.transform.rotation;
 
         firstPersonPlayer.SetActive(true);
         thirdPersonPlayer.SetActive(false);
 
-        FirstPersonController fp = firstPersonPlayer.GetComponent<FirstPersonController>();
-        if (fp != null)
-            fp.ResetVelocity();
+        playerMovement.SetFirstPerson(true);
     }
 
     void ActivateThirdPerson()
     {
-        Vector3 pos = firstPersonPlayer.transform.position;
-
-        // 🔥 ajuste inverso
-        pos.y -= 1.0f;
-
-        thirdPersonPlayer.transform.position = pos;
-        thirdPersonPlayer.transform.rotation = firstPersonPlayer.transform.rotation;
-
         thirdPersonPlayer.SetActive(true);
         firstPersonPlayer.SetActive(false);
 
+        playerMovement.SetFirstPerson(false);
     }
 }

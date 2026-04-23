@@ -87,7 +87,9 @@ Assets/01_Scripts/Player/
  FirstPersonController.cs
  MouseLook.cs
  PlayerCameraController.cs
+ PlayerModeSwitcher.cs
  PlayerMovement.cs
+ PlayerVisualSwitcher.cs
 Assets/
  01_Scripts/Spawner.cs
  TutorialInfo/Scripts/Readme.cs
