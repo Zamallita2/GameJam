@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,11 +11,19 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Referencias")]
     public Rigidbody rb;
-    public Animator animator;
     public Transform cameraTransform;
 
     private Vector3 moveDirection;
     private bool isRunning;
+    public Animator thirdPersonAnimator;
+    public Animator armsAnimator;
+
+    private Animator currentAnimator;
+    public bool isFirstPerson = false;
+    void Start()
+    {   
+        currentAnimator = thirdPersonAnimator;
+    }
 
     void Update()
     {
@@ -101,16 +110,25 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleAnimation()
     {
-        if (animator == null) return;
+        if (currentAnimator == null) return;
 
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float moveAmount = horizontalVelocity.magnitude;
 
         if (isRunning && moveAmount > 0.15f)
-            animator.SetFloat("Speed", 1f);
+            currentAnimator.SetFloat("Speed", 1f);
         else if (moveAmount > 0.05f)
-            animator.SetFloat("Speed", 0.5f);
+            currentAnimator.SetFloat("Speed", 0.5f);
         else
-            animator.SetFloat("Speed", 0f);
+            currentAnimator.SetFloat("Speed", 0f);
+    }
+    public void SetFirstPerson(bool value)
+    {
+        isFirstPerson = value;
+
+        if (isFirstPerson)
+            currentAnimator = armsAnimator;
+        else
+            currentAnimator = thirdPersonAnimator;
     }
 }

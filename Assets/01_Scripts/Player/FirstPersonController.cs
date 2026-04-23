@@ -3,21 +3,24 @@
 public class FirstPersonController : MonoBehaviour
 {
     [Header("Movimiento")]
-    public float walkSpeed = 5f;
-    public float runSpeed = 8f;
+    public float walkSpeed = 3f;
+    public float runSpeed = 6f;
+    public float acceleration = 10f;
     public float gravity = -9.81f;
 
     [Header("Mouse")]
     public float mouseSensitivity = 200f;
     public Transform cameraPivot;
 
+    [Header("Animator")]
+    public Animator armsAnimator;
+
     private float xRotation = 0f;
 
     private CharacterController controller;
     private Vector3 velocity;
-
-    [Header("Animator")]
-    public Animator armsAnimator;
+    private Vector3 currentMove;
+    private bool isRunning;
 
     void Start()
     {
@@ -31,6 +34,7 @@ public class FirstPersonController : MonoBehaviour
     {
         Look();
         Move();
+        HandleAnimation();
     }
 
     void Look()
@@ -47,16 +51,20 @@ public class FirstPersonController : MonoBehaviour
 
     void Move()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
 
-        float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        isRunning = Input.GetKey(KeyCode.LeftShift);
 
-        Vector3 move = transform.right * h + transform.forward * v;
+        float targetSpeed = isRunning ? runSpeed : walkSpeed;
 
-        controller.Move(move * speed * Time.deltaTime);
+        Vector3 inputDir = (transform.right * h + transform.forward * v).normalized;
+        Vector3 targetMove = inputDir * targetSpeed;
 
-        // gravedad
+        currentMove = Vector3.Lerp(currentMove, targetMove, acceleration * Time.deltaTime);
+
+        controller.Move(currentMove * Time.deltaTime);
+
         if (controller.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
@@ -64,28 +72,51 @@ public class FirstPersonController : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+    }
 
-        // 🔥 CALCULAR VELOCIDAD PARA ANIMACIONES
-        float inputMagnitude = new Vector2(h, v).magnitude;
+    void HandleAnimation()
+    {
+        if (armsAnimator == null) return;
 
-        float animSpeed = 0f;
+        Vector3 horizontalMove = new Vector3(currentMove.x, 0f, currentMove.z);
+        float moveAmount = horizontalMove.magnitude;
 
-        if (inputMagnitude > 0.1f)
-        {
-            if (Input.GetKey(KeyCode.LeftShift))
-                animSpeed = 1f;      // correr
-            else
-                animSpeed = 0.5f;   // caminar
-        }
+        if (isRunning && moveAmount > 0.15f)
+            armsAnimator.SetFloat("Speed", 1f);
+        else if (moveAmount > 0.05f)
+            armsAnimator.SetFloat("Speed", 0.5f);
         else
+            armsAnimator.SetFloat("Speed", 0f);
+    }
+
+    public float GetPitch()
+    {
+        return xRotation;
+    }
+
+    public void SetPitch(float pitch)
+    {
+        xRotation = pitch;
+        cameraPivot.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+    }
+
+    public void ResetVelocity()
+    {
+        velocity = Vector3.zero;
+    }
+
+    public void SnapToGround()
+    {
+        RaycastHit hit;
+
+        // lanzamos ray hacia abajo
+        if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 5f))
         {
-            animSpeed = 0f;         // idle
+            // colocamos al player justo sobre el suelo
+            transform.position = hit.point + Vector3.up * 0.1f;
         }
 
-        // 🔥 ENVIAR AL ANIMATOR
-        if (armsAnimator != null)
-        {
-            armsAnimator.SetFloat("Speed", animSpeed);
-        }
+        // resetear gravedad
+        velocity = Vector3.zero;
     }
 }
