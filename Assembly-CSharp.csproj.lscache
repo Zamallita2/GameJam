@@ -50,6 +50,10 @@ TemporaryDependencyNodeTargetIdentifier=netstandard2.1
 /warnaserror+:NU1605
 
 [sourceFiles]
+Assets/00_Scenes/CarlaMinijuego/Assets/Assets/Scripts/
+ Constants.cs
+ Game.cs
+ Piece.cs
 Assets/01_Scripts/Machine/
  HandManager.cs
  MachineGlow.cs
@@ -66,15 +70,21 @@ Assets/01_Scripts/Menu/
  GlowPulse.cs
  MenuMusicManager.cs
  MenuSceneManager.cs
+Assets/01_Scripts/MinijuegoCarla/
+ juego.cs
+ menu.cs
+ pieza.cs
 Assets/01_Scripts/PanelFallas/Arrows/
- ArrowObject.cs
- ArrowSpawner.cs
  FastInputButton3D.cs
  FastInputPanelController.cs
  FastInputPrompt3D.cs
  StatusLampa.cs
 Assets/01_Scripts/PanelFallas/
  FitObjectToCamera.cs
+ Keys/
+  KeyboardMinigameController.cs
+  KeyButtonController.cs
+  KeyPrompt3D.cs
  PanelBase.cs
  PanelDefinition.cs
  PanelLoader.cs

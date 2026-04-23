@@ -9,10 +9,9 @@ public class CablesPanel : MonoBehaviour
 
     [Header("Spawn")]
     public int cableCount = 3;
-    public Vector2 spawnRangeX = new Vector2(-2f, 2f);
-    public Vector2 spawnRangeY = new Vector2(-1.5f, 1.5f);
-    public float fixedZ = 0f;
-    public float minDistance = 1.2f;
+    [Header("Area de Spawn")]
+    public Transform topLeft;
+    public Transform bottomRight;    public float minDistance = 1.2f;
 
     [Header("Visual")]
     public Material lineMaterial;
@@ -55,7 +54,7 @@ public class CablesPanel : MonoBehaviour
             GameObject obj = Instantiate(
                 originPrefab,
                 pos,
-                Quaternion.Euler(0f, -90f, 0f),
+                transform.rotation * Quaternion.Euler(0f, -90f, 0f),
                 transform
             );
 
@@ -76,7 +75,7 @@ public class CablesPanel : MonoBehaviour
             GameObject obj = Instantiate(
                 targetPrefab,
                 pos,
-                Quaternion.Euler(0f, -90f, 0f),
+                transform.rotation * Quaternion.Euler(0f, -90f, 0f),
                 transform
             );
 
@@ -93,20 +92,26 @@ public class CablesPanel : MonoBehaviour
     {
         for (int i = 0; i < 50; i++)
         {
-            Vector3 pos = new Vector3(
-                Random.Range(spawnRangeX.x, spawnRangeX.y),
-                Random.Range(spawnRangeY.x, spawnRangeY.y),
-                fixedZ
+            // interpolación entre esquinas
+            float tX = Random.value;
+            float tY = Random.value;
+
+            Vector3 localPos = new Vector3(
+                Mathf.Lerp(topLeft.localPosition.x, bottomRight.localPosition.x, tX),
+                Mathf.Lerp(topLeft.localPosition.y, bottomRight.localPosition.y, tY),
+                Mathf.Lerp(topLeft.localPosition.z, bottomRight.localPosition.z, tY) // opcional
             );
 
-            if (IsFarEnough(pos))
+            Vector3 worldPos = transform.TransformPoint(localPos);
+
+            if (IsFarEnough(worldPos))
             {
-                usedPositions.Add(pos);
-                return pos;
+                usedPositions.Add(worldPos);
+                return worldPos;
             }
         }
 
-        return Vector3.zero;
+        return transform.position;
     }
 
     bool IsFarEnough(Vector3 pos)
@@ -231,17 +236,18 @@ public class CablesPanel : MonoBehaviour
     }
 
     Vector3 GetMouseWorldPosition()
-    {
+    {   
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        Plane plane = new Plane(Vector3.forward, new Vector3(0, 0, fixedZ));
+        // plano alineado al panel 🐾
+        Plane plane = new Plane(transform.forward, transform.position);
 
         if (plane.Raycast(ray, out float distance))
         {
             return ray.GetPoint(distance);
         }
 
-        return Vector3.zero;
+        return transform.position;
     }
     [Header("Colores")]
     private List<Color> cableColors = new List<Color>()

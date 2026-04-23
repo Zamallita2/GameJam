@@ -6475,6 +6475,8 @@ GameObject:
   m_Component:
   - component: {fileID: 525851736}
   - component: {fileID: 525851738}
+  - component: {fileID: 525851740}
+  - component: {fileID: 525851739}
   - component: {fileID: 525851735}
   - component: {fileID: 525851737}
   m_Layer: 0
@@ -6561,6 +6563,36 @@ MonoBehaviour:
   distanciaNormal: 2
   distanciaClick: 3
   velocidad: 10
+--- !u!114 &525851739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525851734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbe422773efbc90488997ec99b804fa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerModeSwitcher
+  thirdPersonPlayer: {fileID: 0}
+  firstPersonPlayer: {fileID: 0}
+  playerMovement: {fileID: 0}
+--- !u!114 &525851740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525851734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25676ae02ba47b7498212dce5754a670, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVisualSwitcher
+  cameraController: {fileID: 0}
+  thirdPersonBody: {fileID: 0}
+  firstPersonArms: {fileID: 0}
 --- !u!1 &529454343
 GameObject:
   m_ObjectHideFlags: 0
@@ -23960,8 +23992,10 @@ MonoBehaviour:
   rotationSpeed: 10
   acceleration: 12
   rb: {fileID: 1999168124}
-  animator: {fileID: 1999168121}
   cameraTransform: {fileID: 357319004}
+  thirdPersonAnimator: {fileID: 1999168121}
+  armsAnimator: {fileID: 0}
+  isFirstPerson: 0
 --- !u!1 &2007748831
 GameObject:
   m_ObjectHideFlags: 0
