@@ -8,6 +8,9 @@ public class LevelOneCompletionManager : MonoBehaviour
     [Header("Cantidad de máquinas a reparar")]
     public int totalMachines = 4;
 
+    [Header("Luces")]
+    public float lightDisableRadius = 1f;
+
     [Header("Siguiente escena")]
     public string nextSceneName = "Nivel2";
     public float delayBeforeNextScene = 6f;
@@ -18,18 +21,33 @@ public class LevelOneCompletionManager : MonoBehaviour
     private int repairedMachines = 0;
     private bool levelFinished = false;
 
+    private LightFlicker[] allLights;
+
     void Awake()
     {
         Instance = this;
     }
 
-    public void RegisterMachineRepaired()
+    void Start()
+    {
+        // encuentra TODAS las luces automáticamente
+        allLights = FindObjectsByType<LightFlicker>(
+            FindObjectsSortMode.None
+        );
+    }
+
+    public void RegisterMachineRepaired(Transform machine)
     {
         if (levelFinished) return;
 
         repairedMachines++;
 
-        Debug.Log($"[LevelOneCompletion] Máquinas reparadas: {repairedMachines}/{totalMachines}");
+        Debug.Log(
+            $"[LevelOneCompletion] Máquinas reparadas: " +
+            $"{repairedMachines}/{totalMachines}"
+        );
+
+        DisableNearbyLights(machine);
 
         if (repairedMachines >= totalMachines)
         {
@@ -37,16 +55,40 @@ public class LevelOneCompletionManager : MonoBehaviour
         }
     }
 
+    void DisableNearbyLights(Transform machine)
+    {
+        foreach (LightFlicker light in allLights)
+        {
+            if (light == null || light.isTurnedOff)
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    machine.position,
+                    light.transform.position
+                );
+
+            if (distance <= lightDisableRadius)
+            {
+                light.TurnOff();
+            }
+        }
+    }
+
     void FinishLevel()
     {
         levelFinished = true;
 
-        DialogueManager dm = FindAnyObjectByType<DialogueManager>();
+        DialogueManager dm =
+            FindAnyObjectByType<DialogueManager>();
 
         if (dm != null)
         {
             dm.ShowMessage(
-                "Todos los módulos han sido restaurados. El sistema vuelve a estar estable. Excelente trabajo, operador. Preparando siguiente zona...",
+                "Todos los módulos han sido restaurados. " +
+                "El sistema vuelve a estar estable. " +
+                "Excelente trabajo, operador. " +
+                "Preparando siguiente zona...",
                 finalVoice
             );
         }
