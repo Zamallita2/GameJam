@@ -15,16 +15,20 @@ public class TimeManager : MonoBehaviour
 
     // Material del texto (instancia para poder modificar glow)
     private Material textMaterial;
+    public bool started=false;
 
-    void Start()
+    public void Iniciar()
     {
         // Crear instancia del material para no modificar el original
         textMaterial = Instantiate(timerText.fontMaterial);
         timerText.fontMaterial = textMaterial;
+        started=true;
     }
 
     void Update()
     {
+        if(!started)
+            return;
         if (isGameOver) return;
 
         timer += Time.deltaTime;

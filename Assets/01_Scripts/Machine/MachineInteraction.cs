@@ -7,12 +7,13 @@ public class MachineInteraction : MonoBehaviour
     public Camera panelCamera;
     public Camera playerCamera;
     public GameObject player;
+    public GameObject arms;
 
     [Header("Punto real de interacción")]
     public Transform interactionPoint;
 
     [Header("Mano del panel (opcional)")]
-    public Transform panelHand;
+    public GameObject panelHand;
     public Transform panelPointer;
 
     [Header("Configuración")]

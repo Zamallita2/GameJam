@@ -3,11 +3,15 @@ using UnityEngine;
 public class HandManager : MonoBehaviour
 {
     public Transform hand;
+    public GameObject handObj;
     public Transform pointer;
     public Camera cam;
 
     public float distanciaNormal = 2f;
     public float distanciaClick = 3f;
+    public float possY = 0.3f;
+    public float possX = 0.1f;
+    
     public float velocidad = 10f;
 
     private float distanciaActual;
@@ -19,10 +23,12 @@ public class HandManager : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Activar(Camera nuevaCam, Transform nuevaHand, Transform nuevoPointer)
+    public void Activar(Camera nuevaCam, GameObject nuevaHand, Transform nuevoPointer)
     {
         cam = nuevaCam;
-        hand = nuevaHand;
+        handObj = nuevaHand;
+        handObj.SetActive(true);
+        hand = handObj.transform;
         pointer = nuevoPointer;
 
         activo = true;
@@ -33,6 +39,7 @@ public class HandManager : MonoBehaviour
     public void Desactivar()
     {
         activo = false;
+        handObj.SetActive(false);
         gameObject.SetActive(false);
     }
 
@@ -50,6 +57,17 @@ public class HandManager : MonoBehaviour
         mousePos.z = distanciaActual;
 
         Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
+
+        // derecha según la cámara (puede ser X o Z dependiendo de rotación)
+        Vector3 right = cam.transform.right;
+
+        // opcional: ignorar inclinación vertical
+        right.y = 0f;
+        right.Normalize();
+
+        // offset
+        worldPos += right * possX;
+        worldPos += Vector3.down * possY;
 
         pointer.position = worldPos;
         hand.position = pointer.position;
