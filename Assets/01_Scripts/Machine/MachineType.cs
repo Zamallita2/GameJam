@@ -6,7 +6,8 @@ public class MachineType : MonoBehaviour
     {
         Botones,
         Cables,
-        Palancas
+        Palancas,
+        Puzzle
     }
 
     [Header("Configuración de máquina")]

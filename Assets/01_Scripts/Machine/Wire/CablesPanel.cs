@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,29 +8,102 @@ public class CablesPanel : MonoBehaviour
     public GameObject originPrefab;
     public GameObject targetPrefab;
 
+    [Header("Cámara del panel")]
+    public Camera panelCamera;
+
+    [Header("Máquina dueña")]
+    public MachineInteraction machineOwner;
+
     [Header("Spawn")]
     public int cableCount = 3;
-    [Header("Area de Spawn")]
+
+    [Header("Área de Spawn")]
     public Transform topLeft;
-    public Transform bottomRight;    public float minDistance = 1.2f;
+    public Transform bottomRight;
+    public float minDistance = 1.2f;
 
     [Header("Visual")]
     public Material lineMaterial;
     public float lineWidth = 0.05f;
 
+    [Header("Cierre")]
+    public float closePanelDelay = 1f;
+
     private List<CableNode> allNodes = new List<CableNode>();
     private List<Vector3> usedPositions = new List<Vector3>();
+    private List<LineRenderer> finishedLines = new List<LineRenderer>();
 
     private CableNode selectedOrigin;
     private LineRenderer currentLine;
 
-    void Start()
+    private bool completed = false;
+
+    [Header("Colores")]
+    private List<Color> cableColors = new List<Color>()
     {
+        Color.red,
+        Color.blue,
+        Color.green,
+        Color.yellow,
+        new Color(0.5f, 0f, 0.5f),
+        Color.black,
+        Color.white,
+        new Color(0.96f, 0.87f, 0.70f),
+        new Color(0.59f, 0.29f, 0f),
+        new Color(0.86f, 0.08f, 0.24f),
+        new Color(0f, 0.81f, 0.82f),
+        new Color(0.54f, 0.17f, 0.89f)
+    };
+
+    void OnEnable()
+    {
+        SetupPanel();
+    }
+
+    public void SetMachineOwner(MachineInteraction owner)
+    {
+        machineOwner = owner;
+    }
+
+    void SetupPanel()
+    {
+        completed = false;
+
+        if (panelCamera == null)
+            panelCamera = GetComponentInChildren<Camera>(true);
+
+        if (panelCamera == null)
+            panelCamera = Camera.main;
+
+        if (originPrefab == null || targetPrefab == null)
+        {
+            Debug.LogError("[CablesPanel] Faltan prefabs.");
+            enabled = false;
+            return;
+        }
+
+        if (topLeft == null || bottomRight == null)
+        {
+            Debug.LogError("[CablesPanel] Faltan topLeft / bottomRight.");
+            enabled = false;
+            return;
+        }
+
+        if (lineMaterial == null)
+        {
+            Debug.LogError("[CablesPanel] Falta lineMaterial.");
+            enabled = false;
+            return;
+        }
+
+        ClearPanel();
         SpawnAll();
     }
 
     void Update()
     {
+        if (completed) return;
+
         if (selectedOrigin != null && currentLine != null)
         {
             Vector3 start = selectedOrigin.transform.position;
@@ -40,17 +114,42 @@ public class CablesPanel : MonoBehaviour
         }
     }
 
-    // 🧩 SPAWN
+    void ClearPanel()
+    {
+        foreach (var node in allNodes)
+        {
+            if (node != null)
+                Destroy(node.gameObject);
+        }
+
+        foreach (var line in finishedLines)
+        {
+            if (line != null)
+                Destroy(line.gameObject);
+        }
+
+        if (currentLine != null)
+            Destroy(currentLine.gameObject);
+
+        allNodes.Clear();
+        usedPositions.Clear();
+        finishedLines.Clear();
+
+        selectedOrigin = null;
+        currentLine = null;
+    }
+
     void SpawnAll()
     {
         List<int> ids = new List<int>();
+
         for (int i = 0; i < cableCount; i++)
             ids.Add(i);
 
-        // ORIGINS
         foreach (int id in ids)
         {
             Vector3 pos = GetValidPosition();
+
             GameObject obj = Instantiate(
                 originPrefab,
                 pos,
@@ -59,19 +158,27 @@ public class CablesPanel : MonoBehaviour
             );
 
             CableNode node = obj.GetComponent<CableNode>();
+
+            if (node == null)
+            {
+                Debug.LogError("[CablesPanel] El originPrefab no tiene CableNode.");
+                continue;
+            }
+
             node.id = id;
             node.isOrigin = true;
-            node.SetColor(cableColors[id]);
+            node.isConnected = false;
+            node.SetColor(cableColors[id % cableColors.Count]);
 
             allNodes.Add(node);
         }
 
-        // TARGETS (mezclados)
         Shuffle(ids);
 
         foreach (int id in ids)
         {
             Vector3 pos = GetValidPosition();
+
             GameObject obj = Instantiate(
                 targetPrefab,
                 pos,
@@ -80,9 +187,17 @@ public class CablesPanel : MonoBehaviour
             );
 
             CableNode node = obj.GetComponent<CableNode>();
+
+            if (node == null)
+            {
+                Debug.LogError("[CablesPanel] El targetPrefab no tiene CableNode.");
+                continue;
+            }
+
             node.id = id;
             node.isOrigin = false;
-            node.SetColor(cableColors[id]);
+            node.isConnected = false;
+            node.SetColor(cableColors[id % cableColors.Count]);
 
             allNodes.Add(node);
         }
@@ -92,14 +207,13 @@ public class CablesPanel : MonoBehaviour
     {
         for (int i = 0; i < 50; i++)
         {
-            // interpolación entre esquinas
             float tX = Random.value;
             float tY = Random.value;
 
             Vector3 localPos = new Vector3(
                 Mathf.Lerp(topLeft.localPosition.x, bottomRight.localPosition.x, tX),
                 Mathf.Lerp(topLeft.localPosition.y, bottomRight.localPosition.y, tY),
-                Mathf.Lerp(topLeft.localPosition.z, bottomRight.localPosition.z, tY) // opcional
+                Mathf.Lerp(topLeft.localPosition.z, bottomRight.localPosition.z, tY)
             );
 
             Vector3 worldPos = transform.TransformPoint(localPos);
@@ -121,6 +235,7 @@ public class CablesPanel : MonoBehaviour
             if (Vector3.Distance(p, pos) < minDistance)
                 return false;
         }
+
         return true;
     }
 
@@ -135,12 +250,11 @@ public class CablesPanel : MonoBehaviour
         }
     }
 
-    // 🖱 INTERACCIÓN
     public void OnNodeClicked(CableNode node)
     {
-        if (node.isConnected) return;
+        if (completed) return;
+        if (node == null || node.isConnected) return;
 
-        // 🟡 seleccionar origen
         if (node.isOrigin && selectedOrigin == null)
         {
             selectedOrigin = node;
@@ -148,14 +262,12 @@ public class CablesPanel : MonoBehaviour
             return;
         }
 
-        // 🔁 cancelar si clic en otro origen
         if (node.isOrigin && selectedOrigin != null)
         {
             CancelCable();
             return;
         }
 
-        // 🟢 intentar conectar
         if (!node.isOrigin && selectedOrigin != null)
         {
             TryConnect(node);
@@ -167,20 +279,16 @@ public class CablesPanel : MonoBehaviour
         GameObject go = new GameObject("CableLine");
         currentLine = go.AddComponent<LineRenderer>();
 
-        // 🔥 MATERIAL NUEVO (clave)
         currentLine.material = new Material(lineMaterial);
-
         currentLine.startWidth = lineWidth;
         currentLine.endWidth = lineWidth;
         currentLine.positionCount = 2;
+        currentLine.useWorldSpace = true;
 
-        // 🎨 FORZAR COLOR BIEN
-        Color c = cableColors[selectedOrigin.id];
+        Color c = cableColors[selectedOrigin.id % cableColors.Count];
 
         currentLine.startColor = c;
         currentLine.endColor = c;
-
-        // 🔥 EXTRA: asegurar que el material también tenga color
         currentLine.material.color = c;
     }
 
@@ -189,6 +297,7 @@ public class CablesPanel : MonoBehaviour
         if (currentLine != null)
             Destroy(currentLine.gameObject);
 
+        currentLine = null;
         selectedOrigin = null;
     }
 
@@ -196,7 +305,7 @@ public class CablesPanel : MonoBehaviour
     {
         if (target.id == selectedOrigin.id)
         {
-            Debug.Log("Correcto 🟢");
+            Debug.Log("Cable correcto");
 
             selectedOrigin.isConnected = true;
             target.isConnected = true;
@@ -206,8 +315,10 @@ public class CablesPanel : MonoBehaviour
         }
         else
         {
-            Debug.Log("Incorrecto 🔴");
+            Debug.Log("Cable incorrecto");
             CancelCable();
+
+            FindAnyObjectByType<LevelOneDialogueController>()?.CablesError();
         }
     }
 
@@ -218,6 +329,7 @@ public class CablesPanel : MonoBehaviour
             currentLine.SetPosition(0, selectedOrigin.transform.position);
             currentLine.SetPosition(1, target.transform.position);
 
+            finishedLines.Add(currentLine);
             currentLine = null;
         }
 
@@ -232,37 +344,40 @@ public class CablesPanel : MonoBehaviour
                 return;
         }
 
-        Debug.Log("🎉 TODOS LOS CABLES CONECTADOS 🐾✨");
+        Debug.Log("TODOS LOS CABLES CONECTADOS");
+        StartCoroutine(CompleteCablePanelRoutine());
+    }
+
+    IEnumerator CompleteCablePanelRoutine()
+    {
+        completed = true;
+
+        FindAnyObjectByType<LevelOneDialogueController>()?.CablesExito();
+
+        yield return new WaitForSeconds(closePanelDelay);
+
+        if (machineOwner != null)
+        {
+            machineOwner.MarcarMaquinaReparada();
+            machineOwner.CerrarPanelDesdeMinijuego();
+        }
+        else
+        {
+            Debug.LogWarning("[CablesPanel] No hay machineOwner asignado.");
+        }
     }
 
     Vector3 GetMouseWorldPosition()
-    {   
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    {
+        if (panelCamera == null)
+            return transform.position;
 
-        // plano alineado al panel 🐾
+        Ray ray = panelCamera.ScreenPointToRay(Input.mousePosition);
         Plane plane = new Plane(transform.forward, transform.position);
 
         if (plane.Raycast(ray, out float distance))
-        {
             return ray.GetPoint(distance);
-        }
 
         return transform.position;
     }
-    [Header("Colores")]
-    private List<Color> cableColors = new List<Color>()
-    {
-        Color.red,
-        Color.blue,
-        Color.green,
-        Color.yellow,
-        Color.purple,
-        Color.black,
-        Color.white,
-        Color.wheat,
-        Color.brown,
-        Color.crimson,
-        Color.darkTurquoise,
-        Color.blueViolet
-    };
 }

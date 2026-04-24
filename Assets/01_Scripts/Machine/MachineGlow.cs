@@ -9,6 +9,7 @@ public class MachineGlow : MonoBehaviour
     private Renderer rend;
     private float t = 0f;
     private int direction = 1;
+    private bool reparada = false;
 
     void Start()
     {
@@ -26,12 +27,36 @@ public class MachineGlow : MonoBehaviour
 
     void Update()
     {
+        if (reparada) return;
+
         t += Time.deltaTime * (1f / speed) * direction;
 
-        if (t >= 1f) { t = 1f; direction = -1; }
-        if (t <= 0f) { t = 0f; direction = 1; }
+        if (t >= 1f)
+        {
+            t = 1f;
+            direction = -1;
+        }
+
+        if (t <= 0f)
+        {
+            t = 0f;
+            direction = 1;
+        }
 
         Color current = Color.Lerp(Color.black, glowColor * intensity, t);
         rend.material.SetColor("_EmissionColor", current);
+    }
+
+    public void StopGlow()
+    {
+        reparada = true;
+
+        if (rend != null)
+        {
+            rend.material.EnableKeyword("_EMISSION");
+            rend.material.SetColor("_EmissionColor", Color.black);
+        }
+
+        enabled = false;
     }
 }
