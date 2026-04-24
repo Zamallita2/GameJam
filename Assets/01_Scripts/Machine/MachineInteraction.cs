@@ -244,7 +244,7 @@ public class MachineInteraction : MonoBehaviour
             manager = FindAnyObjectByType<LevelOneCompletionManager>();
 
         if (manager != null)
-            manager.RegisterMachineRepaired();
+            manager.RegisterMachineRepaired(transform);
 
         Debug.Log($"[MachineInteraction] Máquina reparada: {gameObject.name}");
     }
