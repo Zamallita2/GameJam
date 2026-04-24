@@ -1,8 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Estado")]
+    public bool canMove = true;
+
     [Header("Velocidad")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
@@ -13,33 +15,90 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody rb;
     public Transform cameraTransform;
 
-    private Vector3 moveDirection;
-    private bool isRunning;
+    [Header("Animadores")]
     public Animator thirdPersonAnimator;
     public Animator armsAnimator;
 
+    private Vector3 moveDirection;
+    private bool isRunning;
     private Animator currentAnimator;
+
     public bool isFirstPerson = false;
+
+    void Awake()
+    {
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
+
+        currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
+    }
+
     void Start()
-    {   
-        currentAnimator = thirdPersonAnimator;
+    {
+        currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
     }
 
     void Update()
     {
+        if (!canMove)
+        {
+            moveDirection = Vector3.zero;
+            isRunning = false;
+            HandleAnimation();
+            return;
+        }
+
         HandleInput();
         HandleAnimation();
     }
 
     void FixedUpdate()
     {
+        if (!canMove)
+        {
+            StopPlayerCompletely();
+            return;
+        }
+
         MovePlayer();
         HandleRotation();
         StopResidualSpin();
     }
 
+    public void SetCanMove(bool value)
+    {
+        canMove = value;
+
+        moveDirection = Vector3.zero;
+        isRunning = false;
+
+        if (currentAnimator == null)
+            currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
+
+        if (currentAnimator != null)
+            currentAnimator.SetFloat("Speed", 0f);
+
+        StopPlayerCompletely();
+
+        Debug.Log("[PlayerMovement] CanMove = " + canMove);
+    }
+
+    void StopPlayerCompletely()
+    {
+        if (rb == null) return;
+
+        rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+        rb.angularVelocity = Vector3.zero;
+    }
+
     void HandleInput()
     {
+        if (cameraTransform == null)
+        {
+            Debug.LogWarning("[PlayerMovement] Falta cameraTransform");
+            return;
+        }
+
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
@@ -59,8 +118,9 @@ public class PlayerMovement : MonoBehaviour
 
     void MovePlayer()
     {
-        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        if (rb == null) return;
 
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
         Vector3 targetVelocity = moveDirection * currentSpeed;
 
         Vector3 currentVelocity = rb.linearVelocity;
@@ -81,7 +141,8 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleRotation()
     {
-        // Gira SOLO por input real
+        if (rb == null) return;
+
         if (moveDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -98,10 +159,10 @@ public class PlayerMovement : MonoBehaviour
 
     void StopResidualSpin()
     {
-        // Mata cualquier giro residual físico
+        if (rb == null) return;
+
         rb.angularVelocity = Vector3.zero;
 
-        // Si no hay input, también mata micro movimiento horizontal
         if (moveDirection.sqrMagnitude < 0.001f)
         {
             rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
@@ -110,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleAnimation()
     {
-        if (currentAnimator == null) return;
+        if (currentAnimator == null || rb == null) return;
 
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float moveAmount = horizontalVelocity.magnitude;
@@ -122,13 +183,10 @@ public class PlayerMovement : MonoBehaviour
         else
             currentAnimator.SetFloat("Speed", 0f);
     }
+
     public void SetFirstPerson(bool value)
     {
         isFirstPerson = value;
-
-        if (isFirstPerson)
-            currentAnimator = armsAnimator;
-        else
-            currentAnimator = thirdPersonAnimator;
+        currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
     }
 }

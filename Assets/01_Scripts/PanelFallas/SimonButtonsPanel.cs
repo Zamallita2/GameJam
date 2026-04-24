@@ -10,9 +10,24 @@ public class SimonButtonsPanel : MonoBehaviour
     [Header("Status Lamp")]
     public StatusLamp statusLamp;
 
+    [Header("Máquina dueña")]
+    public MachineInteraction machineOwner;
+
     [Header("Configuración")]
     public int nivelPrueba = 1;
     public bool iniciarAutomaticamente = true;
+
+    [Tooltip("Cantidad de secuencias correctas necesarias para completar el panel")]
+    public int secuenciasParaCompletar = 3;
+
+    [Tooltip("Longitud inicial de la primera secuencia")]
+    public int baseSequenceLength = 3;
+
+    [Tooltip("Cuánto aumenta la secuencia por ronda correcta")]
+    public int aumentoPorSecuencia = 1;
+
+    [Tooltip("Máximo número de pasos en la secuencia")]
+    public int maxSequenceLength = 10;
 
     [Tooltip("Tiempo que cada botón queda encendido al mostrar la secuencia")]
     public float showDelay = 0.5f;
@@ -23,27 +38,31 @@ public class SimonButtonsPanel : MonoBehaviour
     [Tooltip("Duración del parpadeo de error")]
     public float wrongFlashDuration = 0.2f;
 
-    [Tooltip("Longitud base de la secuencia")]
-    public int baseSequenceLength = 3;
+    [Tooltip("Pausa antes de mostrar la siguiente secuencia")]
+    public float nextSequenceDelay = 0.8f;
 
-    [Tooltip("Máximo número de pasos en la secuencia")]
-    public int maxSequenceLength = 10;
+    [Tooltip("Pausa antes de cerrar el panel al completar todo")]
+    public float closePanelDelay = 1f;
 
     [Header("Sonidos")]
     public AudioSource audioSource;
     public AudioClip correctSound;
     public AudioClip wrongSound;
+    public AudioClip completeSound;
 
     [Header("Click")]
     public Camera inputCamera;
     public LayerMask buttonLayerMask = ~0;
 
     private readonly List<int> sequence = new List<int>();
+
     private int currentInputIndex = 0;
+    private int nivelActual = 1;
+    private int secuenciaActual = 0;
 
     private bool isShowingSequence = false;
     private bool canPlay = false;
-    private int nivelActual = 1;
+    private bool completed = false;
 
     void Awake()
     {
@@ -57,18 +76,16 @@ public class SimonButtonsPanel : MonoBehaviour
             inputCamera = Camera.main;
     }
 
-    void Start()
+    void OnEnable()
     {
         if (iniciarAutomaticamente)
-        {
             Setup(nivelPrueba);
-        }
     }
 
     void Update()
     {
-        if (!canPlay || isShowingSequence)
-            return;
+        if (completed) return;
+        if (!canPlay || isShowingSequence) return;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -85,11 +102,14 @@ public class SimonButtonsPanel : MonoBehaviour
                 SimonButton3D clickedButton = hit.collider.GetComponentInParent<SimonButton3D>();
 
                 if (clickedButton != null)
-                {
                     clickedButton.TriggerPress();
-                }
             }
         }
+    }
+
+    public void SetMachineOwner(MachineInteraction owner)
+    {
+        machineOwner = owner;
     }
 
     public void Setup(int nivel)
@@ -100,12 +120,16 @@ public class SimonButtonsPanel : MonoBehaviour
 
         sequence.Clear();
         currentInputIndex = 0;
+        secuenciaActual = 0;
+
         isShowingSequence = false;
         canPlay = false;
+        completed = false;
 
         for (int i = 0; i < buttons.Count; i++)
         {
             if (buttons[i] == null) continue;
+
             buttons[i].Init(this, i);
             buttons[i].SetInactive();
         }
@@ -113,14 +137,26 @@ public class SimonButtonsPanel : MonoBehaviour
         if (statusLamp != null)
             statusLamp.SetNeutral();
 
+        StartCoroutine(StartNextSequenceRoutine());
+    }
+
+    IEnumerator StartNextSequenceRoutine()
+    {
+        canPlay = false;
+        isShowingSequence = true;
+        currentInputIndex = 0;
+
+        yield return new WaitForSeconds(nextSequenceDelay);
+
         int sequenceLength = Mathf.Clamp(
-            baseSequenceLength + (nivelActual - 1),
+            baseSequenceLength + (secuenciaActual * aumentoPorSecuencia) + (nivelActual - 1),
             baseSequenceLength,
             maxSequenceLength
         );
 
         GenerateSequence(sequenceLength);
-        StartCoroutine(ShowSequenceRoutine());
+
+        yield return StartCoroutine(ShowSequenceRoutine());
     }
 
     void GenerateSequence(int length)
@@ -134,11 +170,9 @@ public class SimonButtonsPanel : MonoBehaviour
         }
 
         for (int i = 0; i < length; i++)
-        {
             sequence.Add(Random.Range(0, buttons.Count));
-        }
 
-        Debug.Log("Secuencia generada: " + string.Join(", ", sequence));
+        Debug.Log($"Secuencia {secuenciaActual + 1}/{secuenciasParaCompletar}: " + string.Join(", ", sequence));
     }
 
     IEnumerator ShowSequenceRoutine()
@@ -167,13 +201,13 @@ public class SimonButtonsPanel : MonoBehaviour
         isShowingSequence = false;
         canPlay = true;
 
-        Debug.Log("Turno del jugador. Debe ingresar " + sequence.Count + " pasos.");
+        Debug.Log($"Turno del jugador. Secuencia {secuenciaActual + 1}/{secuenciasParaCompletar}. Debe ingresar {sequence.Count} pasos.");
     }
 
     public void OnButtonPressed(SimonButton3D pressedButton)
     {
         if (pressedButton == null) return;
-        if (!canPlay || isShowingSequence) return;
+        if (!canPlay || isShowingSequence || completed) return;
         if (currentInputIndex >= sequence.Count) return;
 
         StartCoroutine(pressedButton.FlashActive(0.2f));
@@ -192,9 +226,7 @@ public class SimonButtonsPanel : MonoBehaviour
         currentInputIndex++;
 
         if (currentInputIndex >= sequence.Count)
-        {
             StartCoroutine(CorrectRoutine());
-        }
     }
 
     IEnumerator WrongRoutine()
@@ -231,7 +263,8 @@ public class SimonButtonsPanel : MonoBehaviour
             statusLamp.SetNeutral();
 
         currentInputIndex = 0;
-        StartCoroutine(ShowSequenceRoutine());
+
+        yield return StartCoroutine(ShowSequenceRoutine());
     }
 
     IEnumerator CorrectRoutine()
@@ -262,6 +295,61 @@ public class SimonButtonsPanel : MonoBehaviour
         if (statusLamp != null)
             statusLamp.SetNeutral();
 
-        Debug.Log("Simon completado correctamente");
+        secuenciaActual++;
+
+        Debug.Log($"Secuencia correcta {secuenciaActual}/{secuenciasParaCompletar}");
+
+        if (secuenciaActual >= secuenciasParaCompletar)
+        {
+            StartCoroutine(CompletePanelRoutine());
+        }
+        else
+        {
+            yield return StartCoroutine(StartNextSequenceRoutine());
+        }
+    }
+
+    IEnumerator CompletePanelRoutine()
+    {
+        completed = true;
+        canPlay = false;
+        isShowingSequence = true;
+
+        if (statusLamp != null)
+            statusLamp.SetCorrect();
+
+        if (audioSource != null)
+        {
+            if (completeSound != null)
+                audioSource.PlayOneShot(completeSound);
+            else if (correctSound != null)
+                audioSource.PlayOneShot(correctSound);
+        }
+
+        foreach (var btn in buttons)
+        {
+            if (btn != null)
+                btn.SetActive();
+        }
+
+        Debug.Log("Panel de botones completado. Cerrando panel y apagando brillo de máquina.");
+
+        yield return new WaitForSeconds(closePanelDelay);
+
+        foreach (var btn in buttons)
+        {
+            if (btn != null)
+                btn.SetInactive();
+        }
+
+        if (machineOwner != null)
+        {
+            machineOwner.MarcarMaquinaReparada();
+            machineOwner.CerrarPanelDesdeMinijuego();
+        }
+        else
+        {
+            Debug.LogWarning("SimonButtonsPanel: No hay machineOwner asignado.");
+        }
     }
 }
