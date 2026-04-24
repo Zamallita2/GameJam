@@ -7,6 +7,8 @@ public class LevelOneIntro : MonoBehaviour
 
     [Header("Configuración")]
     public bool playIntroOnStart = true;
+    public float pausaEntreDialogos = 0.6f;
+    public float extraSinAudio = 2.5f;
 
     [Header("Audios de introducción")]
     public AudioClip audioInicializando;
@@ -22,12 +24,9 @@ public class LevelOneIntro : MonoBehaviour
 
     private string[] textos;
     private AudioClip[] audios;
-    private float[] duraciones;
 
     void Start()
     {
-        Debug.Log("[LevelOneIntro] Start ejecutado");
-
         Time.timeScale = 1f;
 
         dm = DialogueManager.Instance;
@@ -56,25 +55,12 @@ public class LevelOneIntro : MonoBehaviour
             audioBuenaSuerte
         };
 
-        duraciones = new float[]
-        {
-            3f,
-            5f,
-            3f,
-            5f,
-            3.5f,
-            2.5f,
-            3f
-        };
-
         if (playIntroOnStart)
             IniciarIntro();
     }
 
     public void IniciarIntro()
     {
-        Debug.Log("[LevelOneIntro] Intro iniciada");
-
         pasoActual = 0;
 
         if (playerMovement != null)
@@ -82,7 +68,6 @@ public class LevelOneIntro : MonoBehaviour
 
         if (dm == null)
         {
-            Debug.LogError("[LevelOneIntro] DialogueManager no encontrado");
             TerminarIntro();
             return;
         }
@@ -98,12 +83,14 @@ public class LevelOneIntro : MonoBehaviour
             return;
         }
 
-        Debug.Log("[LevelOneIntro] Paso " + pasoActual + ": " + textos[pasoActual]);
+        AudioClip audioActual = audios[pasoActual];
 
-        dm.ShowMessage(textos[pasoActual], audios[pasoActual]);
+        dm.ShowMessage(textos[pasoActual], audioActual);
+
+        float duracion = audioActual != null ? audioActual.length + pausaEntreDialogos : extraSinAudio;
 
         CancelInvoke(nameof(SiguientePaso));
-        Invoke(nameof(SiguientePaso), duraciones[pasoActual]);
+        Invoke(nameof(SiguientePaso), duracion);
     }
 
     void SiguientePaso()
@@ -114,8 +101,6 @@ public class LevelOneIntro : MonoBehaviour
 
     void TerminarIntro()
     {
-        Debug.Log("[LevelOneIntro] Intro terminada");
-
         CancelInvoke(nameof(SiguientePaso));
 
         if (dm != null)
