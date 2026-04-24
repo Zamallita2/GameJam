@@ -3,20 +3,21 @@ using UnityEngine;
 
 public class GearInteractable : MonoBehaviour
 {
-    [HideInInspector] public int gearID;
+    public int gearID;
     [HideInInspector] public GearPanel panel;
 
     private bool activated = false;
     private bool isAnimating = false;
+
     private Quaternion originalRot;
-    private Vector3 originalPos;
+    private Vector3 originalScale;
 
     public float animDuration = 1.4f;
 
     void Start()
     {
         originalRot = transform.rotation;
-        originalPos = transform.localPosition;
+        originalScale = transform.localScale; // guardamos escala original (3,3,3)
     }
 
     public void OnClicked()
@@ -29,7 +30,7 @@ public class GearInteractable : MonoBehaviour
     {
         activated = true;
         StopAllCoroutines();
-        StartCoroutine(IrAlFrente());
+        StartCoroutine(AnimarEscala());
     }
 
     public void SetNormal()
@@ -38,22 +39,24 @@ public class GearInteractable : MonoBehaviour
         isAnimating = false;
         StopAllCoroutines();
         transform.rotation = originalRot;
-        transform.localPosition = originalPos;
+        transform.localScale = originalScale;
     }
 
     public void SetError() { }
+
     public bool IsActivated() => activated;
 
-    IEnumerator IrAlFrente()
+    IEnumerator AnimarEscala()
     {
         isAnimating = true;
-        Vector3 target = originalPos + new Vector3(0f, 0f, -3f);
+
+        Vector3 targetScale = new Vector3(5f, 5f, 5f);
         float t = 0f;
 
         while (t < animDuration)
         {
             t += Time.deltaTime;
-            transform.localPosition = Vector3.Lerp(originalPos, target, t / animDuration);
+            transform.localScale = Vector3.Lerp(originalScale, targetScale, t / animDuration);
             yield return null;
         }
 

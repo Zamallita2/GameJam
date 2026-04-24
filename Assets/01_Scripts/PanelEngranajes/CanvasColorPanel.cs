@@ -8,6 +8,7 @@ public class CanvasColorPanel : MonoBehaviour
     public Color colorGray = Color.gray;
     public Color colorGreen = Color.green;
     public Color colorRed = Color.red;
+    private Vector3 originalPos;
 
     void Start()
     {
