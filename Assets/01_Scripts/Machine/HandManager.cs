@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class HandManager : MonoBehaviour
 {
-    public Transform hand;          // La mano
-    public Transform pointer;       // El dedito (surface point)
+    public Transform hand;
+    public Transform pointer;
     public Camera cam;
 
-    public float distanciaNormal = 5f;
-    public float distanciaClick = 8f;
+    public float distanciaNormal = 2f;
+    public float distanciaClick = 3f;
     public float velocidad = 10f;
 
     private float distanciaActual;
@@ -16,11 +16,17 @@ public class HandManager : MonoBehaviour
     void Start()
     {
         distanciaActual = distanciaNormal;
+        gameObject.SetActive(false);
     }
 
-    public void Activar()
+    public void Activar(Camera nuevaCam, Transform nuevaHand, Transform nuevoPointer)
     {
+        cam = nuevaCam;
+        hand = nuevaHand;
+        pointer = nuevoPointer;
+
         activo = true;
+        distanciaActual = distanciaNormal;
         gameObject.SetActive(true);
     }
 
@@ -33,25 +39,19 @@ public class HandManager : MonoBehaviour
     void Update()
     {
         if (!activo) return;
+        if (cam == null || hand == null || pointer == null) return;
 
-        // Detectar click
         if (Input.GetMouseButton(0))
             distanciaActual = Mathf.Lerp(distanciaActual, distanciaClick, Time.deltaTime * velocidad);
         else
             distanciaActual = Mathf.Lerp(distanciaActual, distanciaNormal, Time.deltaTime * velocidad);
 
-        // Posición del mouse con profundidad dinámica
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = distanciaActual;
 
         Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
-        worldPos.y-=0.5f;
-        worldPos.x+=0.05f;
 
-        // Mover el dedito
         pointer.position = worldPos;
-
-        // Opcional: que la mano siga al dedito
         hand.position = pointer.position;
     }
 }

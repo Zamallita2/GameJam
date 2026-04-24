@@ -8,14 +8,24 @@ public class MachineInteraction : MonoBehaviour
     public Camera playerCamera;
     public GameObject player;
 
+    [Header("Punto real de interacción")]
+    public Transform interactionPoint;
+
+    [Header("Mano del panel (opcional)")]
+    public Transform panelHand;
+    public Transform panelPointer;
+
     [Header("Configuración")]
     public KeyCode interactKey = KeyCode.E;
     public float interactionDistance = 3f;
+    public bool mostrarLogs = true;
 
     private bool panelActivo = false;
+
     private MachineType machineType;
     private PanelLoader panelLoader;
     private HandManager handManager;
+    private PlayerPanelVisibility playerPanelVisibility;
 
     void Awake()
     {
@@ -23,15 +33,20 @@ public class MachineInteraction : MonoBehaviour
         AutoAssignReferences();
     }
 
+    void Start()
+    {
+        if (panelRoot != null)
+            panelRoot.SetActive(false);
+
+        if (panelCamera != null)
+            panelCamera.enabled = false;
+
+        if (playerCamera != null)
+            playerCamera.enabled = true;
+    }
+
     void AutoAssignReferences()
     {
-        if (panelRoot == null)
-        {
-            GameObject foundPanel = GameObject.Find("PanelRoot");
-            if (foundPanel != null)
-                panelRoot = foundPanel;
-        }
-
         if (player == null)
         {
             GameObject foundPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -46,39 +61,40 @@ public class MachineInteraction : MonoBehaviour
                 playerCamera = mainCam;
         }
 
-        if (panelRoot != null)
-        {
-            if (panelCamera == null)
-                panelCamera = panelRoot.GetComponentInChildren<Camera>(true);
+        if (panelRoot != null && panelLoader == null)
+            panelLoader = panelRoot.GetComponentInChildren<PanelLoader>(true);
 
-            if (panelLoader == null)
-                panelLoader = panelRoot.GetComponentInChildren<PanelLoader>(true);
+        if (handManager == null)
+            handManager = FindFirstObjectByType<HandManager>(FindObjectsInactive.Include);
 
-            if (handManager == null)
-                handManager = FindFirstObjectByType<HandManager>();
-        }
+        if (playerPanelVisibility == null)
+            playerPanelVisibility = FindFirstObjectByType<PlayerPanelVisibility>(FindObjectsInactive.Include);
     }
 
     void Update()
     {
         if (player == null || panelRoot == null || panelCamera == null || playerCamera == null || machineType == null)
+        {
+            if (mostrarLogs)
+                Debug.LogWarning($"[MachineInteraction] Faltan referencias en {gameObject.name}");
             return;
+        }
 
-        float dist = Vector3.Distance(player.transform.position, transform.position);
+        Vector3 point = interactionPoint != null ? interactionPoint.position : transform.position;
+        float dist = Vector3.Distance(player.transform.position, point);
         bool playerNear = dist <= interactionDistance;
+
+        if (Input.GetKeyDown(interactKey) && mostrarLogs)
+            Debug.Log($"[{gameObject.name}] Distancia = {dist} | Cerca = {playerNear}");
 
         if (playerNear && Input.GetKeyDown(interactKey) && !panelActivo)
         {
             ActivarPanel();
-            if (handManager != null)
-                handManager.Activar();
         }
 
         if (panelActivo && Input.GetKeyDown(KeyCode.Escape))
         {
             DesactivarPanel();
-            if (handManager != null)
-                handManager.Desactivar();
         }
     }
 
@@ -86,42 +102,83 @@ public class MachineInteraction : MonoBehaviour
     {
         panelActivo = true;
 
-        panelRoot.SetActive(true);
-        panelCamera.gameObject.SetActive(true);
-        playerCamera.gameObject.SetActive(false);
+        if (mostrarLogs)
+            Debug.Log($"[MachineInteraction] Activando panel: {gameObject.name}");
+
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
+        if (panelCamera != null)
+            panelCamera.enabled = true;
+
+        if (playerCamera != null)
+            playerCamera.enabled = false;
 
         if (panelLoader != null)
             panelLoader.CargarPanel(machineType.tipo, machineType.nivel);
 
+        if (handManager != null)
+        {
+            if (panelHand != null && panelPointer != null)
+                handManager.Activar(panelCamera, panelHand, panelPointer);
+            else
+                handManager.Desactivar();
+        }
+
+        if (playerPanelVisibility != null)
+            playerPanelVisibility.HideForPanel();
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        PlayerMovement movement = player.GetComponent<PlayerMovement>();
-        if (movement != null)
-            movement.enabled = false;
+        if (player != null)
+        {
+            PlayerMovement movement = player.GetComponent<PlayerMovement>();
+            if (movement != null)
+                movement.enabled = false;
+        }
     }
 
     void DesactivarPanel()
     {
         panelActivo = false;
 
+        if (mostrarLogs)
+            Debug.Log($"[MachineInteraction] Desactivando panel: {gameObject.name}");
+
         if (panelLoader != null)
             panelLoader.LimpiarPanelActual();
 
         if (panelCamera != null)
-            panelCamera.gameObject.SetActive(false);
+            panelCamera.enabled = false;
 
         if (playerCamera != null)
-            playerCamera.gameObject.SetActive(true);
+            playerCamera.enabled = true;
 
         if (panelRoot != null)
             panelRoot.SetActive(false);
 
+        if (handManager != null)
+            handManager.Desactivar();
+
+        if (playerPanelVisibility != null)
+            playerPanelVisibility.ShowAfterPanel();
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        PlayerMovement movement = player.GetComponent<PlayerMovement>();
-        if (movement != null)
-            movement.enabled = true;
+        if (player != null)
+        {
+            PlayerMovement movement = player.GetComponent<PlayerMovement>();
+            if (movement != null)
+                movement.enabled = true;
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Vector3 point = interactionPoint != null ? interactionPoint.position : transform.position;
+        Gizmos.DrawWireSphere(point, interactionDistance);
     }
 }

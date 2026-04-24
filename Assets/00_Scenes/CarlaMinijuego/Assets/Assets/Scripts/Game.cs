@@ -1,41 +1,132 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Assets.Scripts;
-using System.Collections.Generic;
-
 
 public class Game : MonoBehaviour
 {
+    [Header("Centro del puzzle")]
     public Transform puzzleCenter;
 
-    // Use this for initialization
+    [Header("Piezas en orden")]
+    public GameObject[] go;
+
+    [Header("Escala de piezas")]
+    public float pieceScale = 0.45f;
+
+    [Header("Separación entre piezas")]
+    public float pieceSpacing = 0.20f;
+
+    [Header("Velocidad animación")]
+    public float AnimSpeed = 10f;
+
+    [Header("Mezcla")]
+    public int shuffleMoves = 20;
+
+    [Header("Click")]
+    public Camera puzzleCamera;
+    public float maxScreenClickDistance = 80f;
+
+    private Vector3 screenPositionToAnimate;
+    private Piece pieceToAnimate;
+    private int toAnimateI;
+    private int toAnimateJ;
+
+    public Piece[,] Matrix = new Piece[Constants.MaxColumns, Constants.MaxRows];
+    private GameState gameState;
+
     void Start()
     {
+        if (puzzleCenter == null)
+        {
+            Debug.LogError("[Game] Falta asignar puzzleCenter.");
+            enabled = false;
+            return;
+        }
+
+        if (go == null || go.Length != Constants.MaxSize)
+        {
+            Debug.LogError("[Game] Debes asignar exactamente 9 piezas en el array go.");
+            enabled = false;
+            return;
+        }
+
+        if (puzzleCamera == null)
+            puzzleCamera = Camera.main;
+
         gameState = GameState.Start;
 
-        SetPiecesScale(0.4f);
+        PreparePieces();
+        BuildMatrix();
+        RefreshAllPiecePositions();
+    }
 
-        int index = Constants.MaxSize - 1;
-        go[index].SetActive(false);
+    void Update()
+    {
+        switch (gameState)
+        {
+            case GameState.Start:
+                if (Input.GetMouseButtonUp(0))
+                {
+                    Shuffle();
+                    gameState = GameState.Playing;
+                }
+                break;
 
+            case GameState.Playing:
+                CheckPieceInput();
+                break;
+
+            case GameState.Animating:
+                AnimateMovement(pieceToAnimate, Time.deltaTime);
+                CheckIfAnimationEnded();
+                break;
+
+            case GameState.End:
+                break;
+        }
+    }
+
+    void OnGUI()
+    {
+        switch (gameState)
+        {
+            case GameState.Start:
+                GUI.Label(new Rect(10, 10, 220, 30), "Tap para empezar");
+                break;
+
+            case GameState.End:
+                GUI.Label(new Rect(10, 10, 260, 30), "Puzzle completado");
+                break;
+        }
+    }
+
+    private void PreparePieces()
+    {
+        SetPiecesScale(pieceScale);
+
+        int emptyIndex = Constants.MaxSize - 1;
+        if (go[emptyIndex] != null)
+            go[emptyIndex].SetActive(false);
+    }
+
+    private void BuildMatrix()
+    {
         for (int i = 0; i < Constants.MaxColumns; i++)
         {
             for (int j = 0; j < Constants.MaxRows; j++)
             {
-                if (go[i * Constants.MaxColumns + j].activeInHierarchy)
+                int index = i * Constants.MaxColumns + j;
+
+                if (go[index] != null && go[index].activeInHierarchy)
                 {
-                    Vector3 point = GetScreenCoordinatesFromVieport(i, j);
-                    go[i * Constants.MaxColumns + j].transform.position = point;
-
-                    Matrix[i, j] = new Piece();
-                    Matrix[i, j].GameObject = go[i * Constants.MaxColumns + j];
-                    Matrix[i, j].OriginalI = i;
-                    Matrix[i, j].OriginalJ = j;
-                    Matrix[i, j].CurrentI = i;
-                    Matrix[i, j].CurrentJ = j;
-
-                    if (Matrix[i, j].GameObject.GetComponent<BoxCollider2D>() == null)
-                        Matrix[i, j].GameObject.AddComponent<BoxCollider2D>();
+                    Matrix[i, j] = new Piece
+                    {
+                        GameObject = go[index],
+                        OriginalI = i,
+                        OriginalJ = j,
+                        CurrentI = i,
+                        CurrentJ = j
+                    };
                 }
                 else
                 {
@@ -49,330 +140,263 @@ public class Game : MonoBehaviour
     {
         for (int c = 0; c < go.Length; c++)
         {
-            go[c].transform.localScale = new Vector3(scaleValue, scaleValue, 1f);
+            if (go[c] != null)
+                go[c].transform.localScale = new Vector3(scaleValue, scaleValue, 1f);
         }
+    }
+
+    private void RefreshAllPiecePositions()
+    {
+        for (int i = 0; i < Constants.MaxColumns; i++)
+        {
+            for (int j = 0; j < Constants.MaxRows; j++)
+            {
+                if (Matrix[i, j] != null)
+                {
+                    Matrix[i, j].GameObject.transform.position = GetBoardPosition(i, j);
+                }
+            }
+        }
+    }
+
+    private Vector3 GetBoardPosition(int i, int j)
+    {
+        float totalWidth = (Constants.MaxRows - 1) * pieceSpacing;
+        float totalHeight = (Constants.MaxColumns - 1) * pieceSpacing;
+
+        float startX = -totalWidth * 0.5f;
+        float startY = totalHeight * 0.5f;
+
+        Vector3 localOffset = new Vector3(
+            startX + (j * pieceSpacing),
+            startY - (i * pieceSpacing),
+            0f
+        );
+
+        return puzzleCenter.position
+             + puzzleCenter.right * localOffset.x
+             + puzzleCenter.up * localOffset.y;
     }
 
     private void Shuffle()
     {
-        int shuffleMoves = 10;
-
         Vector2Int lastMove = Vector2Int.zero;
 
-        // mezclar normalmente
         for (int move = 0; move < shuffleMoves; move++)
         {
             int emptyI = -1;
             int emptyJ = -1;
 
-            // encontrar espacio vacío
-            for (int i = 0; i < Constants.MaxColumns; i++)
-            {
-                for (int j = 0; j < Constants.MaxRows; j++)
-                {
-                    if (Matrix[i, j] == null)
-                    {
-                        emptyI = i;
-                        emptyJ = j;
-                    }
-                }
-            }
+            FindEmptyCell(out emptyI, out emptyJ);
 
-            List<Vector2Int> possibleMoves =
-                new List<Vector2Int>();
+            List<Vector2Int> possibleMoves = new List<Vector2Int>();
 
-            // arriba
-            if (emptyI > 0 &&
-                lastMove != Vector2Int.down)
-            {
+            if (emptyI > 0 && lastMove != Vector2Int.down)
                 possibleMoves.Add(Vector2Int.up);
-            }
 
-            // abajo
-            if (emptyI < Constants.MaxColumns - 1 &&
-                lastMove != Vector2Int.up)
-            {
+            if (emptyI < Constants.MaxColumns - 1 && lastMove != Vector2Int.up)
                 possibleMoves.Add(Vector2Int.down);
-            }
 
-            // izquierda
-            if (emptyJ > 0 &&
-                lastMove != Vector2Int.right)
-            {
+            if (emptyJ > 0 && lastMove != Vector2Int.right)
                 possibleMoves.Add(Vector2Int.left);
-            }
 
-            // derecha
-            if (emptyJ < Constants.MaxRows - 1 &&
-                lastMove != Vector2Int.left)
-            {
+            if (emptyJ < Constants.MaxRows - 1 && lastMove != Vector2Int.left)
                 possibleMoves.Add(Vector2Int.right);
-            }
 
-            Vector2Int dir =
-                possibleMoves[
-                    Random.Range(0, possibleMoves.Count)];
+            Vector2Int dir = possibleMoves[Random.Range(0, possibleMoves.Count)];
 
             int targetI = emptyI;
             int targetJ = emptyJ;
 
-            if (dir == Vector2Int.up)
-                targetI--;
-
-            else if (dir == Vector2Int.down)
-                targetI++;
-
-            else if (dir == Vector2Int.left)
-                targetJ--;
-
-            else if (dir == Vector2Int.right)
-                targetJ++;
+            if (dir == Vector2Int.up) targetI--;
+            else if (dir == Vector2Int.down) targetI++;
+            else if (dir == Vector2Int.left) targetJ--;
+            else if (dir == Vector2Int.right) targetJ++;
 
             Swap(targetI, targetJ, emptyI, emptyJ);
-
             lastMove = dir;
         }
 
-        // -----------------------------------
-        // asegurar hueco abajo derecha
-        // -----------------------------------
+        MoveEmptyToBottomRight();
+    }
 
-        int finalEmptyI = -1;
-        int finalEmptyJ = -1;
+    private void MoveEmptyToBottomRight()
+    {
+        int finalEmptyI, finalEmptyJ;
+        FindEmptyCell(out finalEmptyI, out finalEmptyJ);
 
-        // buscar nuevamente el hueco
+        while (finalEmptyI < Constants.MaxColumns - 1)
+        {
+            Swap(finalEmptyI + 1, finalEmptyJ, finalEmptyI, finalEmptyJ);
+            finalEmptyI++;
+        }
+
+        while (finalEmptyJ < Constants.MaxRows - 1)
+        {
+            Swap(finalEmptyI, finalEmptyJ + 1, finalEmptyI, finalEmptyJ);
+            finalEmptyJ++;
+        }
+    }
+
+    private void FindEmptyCell(out int emptyI, out int emptyJ)
+    {
+        emptyI = -1;
+        emptyJ = -1;
+
         for (int i = 0; i < Constants.MaxColumns; i++)
         {
             for (int j = 0; j < Constants.MaxRows; j++)
             {
                 if (Matrix[i, j] == null)
                 {
-                    finalEmptyI = i;
-                    finalEmptyJ = j;
+                    emptyI = i;
+                    emptyJ = j;
+                    return;
                 }
             }
         }
-
-        // mover verticalmente
-        while (finalEmptyI < Constants.MaxColumns - 1)
-        {
-            Swap(finalEmptyI + 1, finalEmptyJ,
-                 finalEmptyI, finalEmptyJ);
-
-            finalEmptyI++;
-        }
-
-        // mover horizontalmente
-        while (finalEmptyJ < Constants.MaxRows - 1)
-        {
-            Swap(finalEmptyI, finalEmptyJ + 1,
-                 finalEmptyI, finalEmptyJ);
-
-            finalEmptyJ++;
-        }
     }
 
-    private void Swap(int i, int j, int random_i, int random_j)
+    private void Swap(int i, int j, int randomI, int randomJ)
     {
-        // evitar error si ambos son null
-        if (Matrix[i, j] == null &&
-            Matrix[random_i, random_j] == null)
-        {
+        if (Matrix[i, j] == null && Matrix[randomI, randomJ] == null)
             return;
-        }
 
-        // intercambio
         Piece temp = Matrix[i, j];
-        Matrix[i, j] = Matrix[random_i, random_j];
-        Matrix[random_i, random_j] = temp;
+        Matrix[i, j] = Matrix[randomI, randomJ];
+        Matrix[randomI, randomJ] = temp;
 
-        // actualizar posición visual
         if (Matrix[i, j] != null)
         {
-            Matrix[i, j].GameObject.transform.position =
-                GetScreenCoordinatesFromVieport(i, j);
-
+            Matrix[i, j].GameObject.transform.position = GetBoardPosition(i, j);
             Matrix[i, j].CurrentI = i;
             Matrix[i, j].CurrentJ = j;
         }
 
-        if (Matrix[random_i, random_j] != null)
+        if (Matrix[randomI, randomJ] != null)
         {
-            Matrix[random_i, random_j].GameObject.transform.position =
-                GetScreenCoordinatesFromVieport(random_i, random_j);
-
-            Matrix[random_i, random_j].CurrentI = random_i;
-            Matrix[random_i, random_j].CurrentJ = random_j;
+            Matrix[randomI, randomJ].GameObject.transform.position = GetBoardPosition(randomI, randomJ);
+            Matrix[randomI, randomJ].CurrentI = randomI;
+            Matrix[randomI, randomJ].CurrentJ = randomJ;
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void CheckPieceInput()
     {
-        switch (gameState)
+        if (!Input.GetMouseButtonUp(0))
+            return;
+
+        if (puzzleCamera == null)
         {
-            case GameState.Start:
-                if (Input.GetMouseButtonUp(0))
-                {
-                    Shuffle();
-                    gameState = GameState.Playing;
-                }
-                break;
-            case GameState.Playing:
-                CheckPieceInput();
-                break;
-            case GameState.Animating:
-                AnimateMovement(PieceToAnimate, Time.deltaTime);
-                CheckIfAnimationEnded();
-                break;
-            case GameState.End:
-                break;
-            default:
-                break;
+            Debug.LogError("[Game] No hay cámara asignada.");
+            return;
         }
 
+        Vector3 mouseScreenPos = Input.mousePosition;
 
-    }
+        int iFound = -1;
+        int jFound = -1;
+        float bestDistance = float.MaxValue;
 
-   
-    /// <summary>
-    /// boring UI, waiting for uGUI framework :)
-    /// </summary>
-    void OnGUI()
-    {
-        switch (gameState)
+        // Buscar la pieza visible más cercana al click en pantalla
+        for (int i = 0; i < Constants.MaxColumns; i++)
         {
-            case GameState.Start:
-                GUI.Label(new Rect(0, 0, 100, 100), "Tap to start!");
-                break;
-            case GameState.Playing:
-                break;
-            case GameState.End:
-                GUI.Label(new Rect(0, 0, 100, 100), "Congrats, tap to start over!");
-                break;
-            default:
-                break;
-        }
-    }
-
-
-    void CheckPieceInput()
-    {
-        if (Input.GetMouseButtonUp(0))
-        {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
-
-            if (hit.collider != null)
+            for (int j = 0; j < Constants.MaxRows; j++)
             {
-                Debug.Log("Click en: " + hit.collider.gameObject.name);
+                if (Matrix[i, j] == null || Matrix[i, j].GameObject == null)
+                    continue;
 
-                int iFound = -1;
-                int jFound = -1;
+                Vector3 pieceScreenPos = puzzleCamera.WorldToScreenPoint(Matrix[i, j].GameObject.transform.position);
 
-                for (int i = 0; i < Constants.MaxColumns; i++)
-                {
-                    for (int j = 0; j < Constants.MaxRows; j++)
-                    {
-                        if (Matrix[i, j] == null)
-                            continue;
+                if (pieceScreenPos.z < 0f)
+                    continue;
 
-                        if (Matrix[i, j].GameObject == hit.collider.gameObject)
-                        {
-                            iFound = i;
-                            jFound = j;
-                            break;
-                        }
-                    }
-                }
+                float dist = Vector2.Distance(
+                    new Vector2(mouseScreenPos.x, mouseScreenPos.y),
+                    new Vector2(pieceScreenPos.x, pieceScreenPos.y)
+                );
 
-                if (iFound == -1 || jFound == -1)
+                if (dist < bestDistance)
                 {
-                    Debug.Log("No encontré la pieza en la matriz");
-                    return;
-                }
-
-                bool pieceFound = false;
-
-                if (iFound > 0 && Matrix[iFound - 1, jFound] == null)
-                {
-                    pieceFound = true;
-                    toAnimateI = iFound - 1;
-                    toAnimateJ = jFound;
-                }
-                else if (jFound > 0 && Matrix[iFound, jFound - 1] == null)
-                {
-                    pieceFound = true;
-                    toAnimateI = iFound;
-                    toAnimateJ = jFound - 1;
-                }
-                else if (iFound < Constants.MaxColumns - 1 && Matrix[iFound + 1, jFound] == null)
-                {
-                    pieceFound = true;
-                    toAnimateI = iFound + 1;
-                    toAnimateJ = jFound;
-                }
-                else if (jFound < Constants.MaxRows - 1 && Matrix[iFound, jFound + 1] == null)
-                {
-                    pieceFound = true;
-                    toAnimateI = iFound;
-                    toAnimateJ = jFound + 1;
-                }
-
-                if (pieceFound)
-                {
-                    screenPositionToAnimate = GetScreenCoordinatesFromVieport(toAnimateI, toAnimateJ);
-                    PieceToAnimate = Matrix[iFound, jFound];
-                    gameState = GameState.Animating;
-                }
-                else
-                {
-                    Debug.Log("La pieza no está junto al espacio vacío");
+                    bestDistance = dist;
+                    iFound = i;
+                    jFound = j;
                 }
             }
-            else
-            {
-                Debug.Log("No golpeó ningún collider");
-            }
         }
+
+        if (iFound == -1 || jFound == -1)
+        {
+            Debug.Log("No encontré pieza válida");
+            return;
+        }
+
+        if (bestDistance > maxScreenClickDistance)
+        {
+            Debug.Log($"Click demasiado lejos de una pieza. Distancia={bestDistance}");
+            return;
+        }
+
+        Debug.Log($"Pieza seleccionada por cercanía: ({iFound},{jFound}) DistanciaPantalla={bestDistance}");
+
+        int emptyI, emptyJ;
+        FindEmptyCell(out emptyI, out emptyJ);
+
+        if (emptyI == -1 || emptyJ == -1)
+        {
+            Debug.Log("No se encontró espacio vacío");
+            return;
+        }
+
+        int manhattanDistance = Mathf.Abs(iFound - emptyI) + Mathf.Abs(jFound - emptyJ);
+
+        if (manhattanDistance != 1)
+        {
+            Debug.Log($"La pieza no está junto al espacio vacío. Pieza=({iFound},{jFound}) Vacío=({emptyI},{emptyJ})");
+            return;
+        }
+
+        toAnimateI = emptyI;
+        toAnimateJ = emptyJ;
+        screenPositionToAnimate = GetBoardPosition(toAnimateI, toAnimateJ);
+        pieceToAnimate = Matrix[iFound, jFound];
+        gameState = GameState.Animating;
     }
 
-
-    private void AnimateMovement(Piece toMove,  float time)
+    private void AnimateMovement(Piece toMove, float time)
     {
-        //animate it
-        //Lerp could also be used, but I prefer the MoveTowards approach :)
-        toMove.GameObject.transform.position = Vector2.MoveTowards(toMove.GameObject.transform.position, 
-          screenPositionToAnimate , time * AnimSpeed);
+        if (toMove == null || toMove.GameObject == null)
+            return;
+
+        toMove.GameObject.transform.position = Vector3.MoveTowards(
+            toMove.GameObject.transform.position,
+            screenPositionToAnimate,
+            time * AnimSpeed
+        );
     }
 
-    /// <summary>
-    /// A simple check to see if the animation has finished
-    /// </summary>
     private void CheckIfAnimationEnded()
     {
-        if(Vector2.Distance(PieceToAnimate.GameObject.transform.position, 
-            screenPositionToAnimate) < 0.1f)
+        if (pieceToAnimate == null || pieceToAnimate.GameObject == null)
+            return;
+
+        if (Vector3.Distance(pieceToAnimate.GameObject.transform.position, screenPositionToAnimate) < 0.05f)
         {
-            //make sure they swap, exchange positions and stuff
-            Swap(PieceToAnimate.CurrentI, PieceToAnimate.CurrentJ, toAnimateI, toAnimateJ);
+            Swap(pieceToAnimate.CurrentI, pieceToAnimate.CurrentJ, toAnimateI, toAnimateJ);
             gameState = GameState.Playing;
-            //check if the use has won
             CheckForVictory();
         }
     }
 
     private void CheckForVictory()
     {
-        int correctIndex = 0;
-
         for (int i = 0; i < Constants.MaxColumns; i++)
         {
             for (int j = 0; j < Constants.MaxRows; j++)
             {
-                // última casilla vacía
-                if (i == Constants.MaxColumns - 1 &&
-                    j == Constants.MaxRows - 1)
+                bool isLastCell = (i == Constants.MaxColumns - 1 && j == Constants.MaxRows - 1);
+
+                if (isLastCell)
                 {
                     if (Matrix[i, j] != null)
                         return;
@@ -382,57 +406,14 @@ public class Game : MonoBehaviour
                     if (Matrix[i, j] == null)
                         return;
 
-                    if (Matrix[i, j].OriginalI != i ||
-                        Matrix[i, j].OriginalJ != j)
-                    {
+                    if (Matrix[i, j].OriginalI != i || Matrix[i, j].OriginalJ != j)
                         return;
-                    }
                 }
-
-                correctIndex++;
             }
         }
 
         gameState = GameState.End;
-
         Debug.Log("PUZZLE COMPLETADO");
-
         transform.root.gameObject.SetActive(false);
     }
-
-    private void ScalePieces() {
-        SpriteRenderer spriteRenderer = go[0].GetComponent<SpriteRenderer>();
-        float screenHeight = Camera.main.orthographicSize * 2f;
-        float screenWidth = screenHeight / Screen.height * Screen.width;
-        float width = screenWidth / spriteRenderer.sprite.bounds.size.x / 4;
-        float height = screenHeight / spriteRenderer.sprite.bounds.size.y / 4;
-        for (int c = 0; c < go.Length; c++) {
-            go[c].transform.localScale = new Vector3(width, height, 1f);
-        }
-    }
-
-    private Vector3 GetScreenCoordinatesFromVieport(int i, int j)
-    {
-        float pieceSize = 1.7f;
-
-        float offsetX = -pieceSize;
-        float offsetY = pieceSize;
-
-        Vector3 point = puzzleCenter.position + new Vector3(
-            offsetX + (j * pieceSize),
-            offsetY - (i * pieceSize),
-            0
-        );
-
-        return point;
-    }
-
-    Vector3 screenPositionToAnimate;
-    private Piece PieceToAnimate;
-    private int toAnimateI, toAnimateJ;
-
-    public Piece[,] Matrix = new Piece[Constants.MaxColumns, Constants.MaxRows];
-    private GameState gameState;
-    public GameObject[] go;
-    public float AnimSpeed = 10f;
 }

@@ -7,13 +7,13 @@ public class CableNode : MonoBehaviour
     public bool isConnected = false;
 
     [Header("Visual")]
-    public Renderer targetRenderer; // arrastras el hijo aquí
+    public Renderer targetRenderer;
 
     private CablesPanel panel;
 
-    void Start()
+    void Awake()
     {
-        panel = FindFirstObjectByType<CablesPanel>();
+        panel = GetComponentInParent<CablesPanel>();
     }
 
     void OnMouseDown()
@@ -26,7 +26,6 @@ public class CableNode : MonoBehaviour
     {
         if (targetRenderer != null)
         {
-            // 🔥 IMPORTANTE: esto crea instancia única del material
             targetRenderer.material = new Material(targetRenderer.material);
             targetRenderer.material.color = color;
         }
