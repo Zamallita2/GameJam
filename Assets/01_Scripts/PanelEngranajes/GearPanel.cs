@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 
 public class GearPanel : MonoBehaviour
 {
-    [Header("Engranajes en orden correcto")]
+    [Header("Engranajes")]
     public GearInteractable[] gearsInOrder;
+    public int currentGear =0;
 
     [Header("Lamp")]
     public Renderer statusLamp;
@@ -16,11 +17,12 @@ public class GearPanel : MonoBehaviour
     [Header("Canvas")]
     public CanvasColorPanel canvasPanel;
 
-    private int currentStep = 0;
     private bool panelDone = false;
 
     void Start()
     {
+        ShuffleArray(gearsInOrder);
+
         for (int i = 0; i < gearsInOrder.Length; i++)
         {
             gearsInOrder[i].gearID = i;
@@ -33,7 +35,17 @@ public class GearPanel : MonoBehaviour
         if (canvasPanel != null)
             canvasPanel.SetGray();
     }
+    void ShuffleArray(GearInteractable[] array)
+    {
+        for (int i = array.Length - 1; i > 0; i--)
+        {
+            int randIndex = Random.Range(0, i + 1);
 
+            GearInteractable temp = array[i];
+            array[i] = array[randIndex];
+            array[randIndex] = temp;
+        }
+    }
     void Update()
     {
         if (panelDone) return;
@@ -55,42 +67,41 @@ public class GearPanel : MonoBehaviour
 
     public void OnGearClicked(GearInteractable gear)
     {
-        if (panelDone) return;
+        if (panelDone || gear.IsActivated()) return;
 
-        if (gear.gearID == currentStep)
+        if (gear.gearID == currentGear)
         {
             gear.SetActivo();
-            currentStep++;
-
-            if (canvasPanel != null) canvasPanel.SetGreen();
-
-            if (currentStep >= gearsInOrder.Length)
-                PanelCompleted();
+            currentGear++;
         }
         else
         {
-            StartCoroutine(HandleError(gear));
+            foreach (var g in gearsInOrder)
+            {
+                g.SetNormal();
+            }
+            currentGear = 0;
         }
-    }
 
-    IEnumerator HandleError(GearInteractable wrongGear)
-    {
-        if (statusLamp != null && lampError != null)
-            statusLamp.material = lampError;
-
-        if (canvasPanel != null) canvasPanel.SetRedThenGray();
-
-        wrongGear.SetError();
-
-        yield return new WaitForSeconds(0.8f);
+        // comprobar si todos están activados
+        bool allActivated = true;
 
         foreach (var g in gearsInOrder)
-            g.SetNormal();
+        {
+            if (!g.IsActivated())
+            {
+                allActivated = false;
+                break;
+            }
+        }
 
-        currentStep = 0;
+        if (allActivated)
+        {
 
-        if (statusLamp != null && lampNormal != null)
-            statusLamp.material = lampNormal;
+            PanelCompleted();
+            if (canvasPanel != null)
+                canvasPanel.SetGreen();
+        }
     }
 
     void PanelCompleted()
@@ -100,9 +111,9 @@ public class GearPanel : MonoBehaviour
         if (statusLamp != null && lampOk != null)
             statusLamp.material = lampOk;
 
-        if (canvasPanel != null) canvasPanel.SetGreen();
+        if (canvasPanel != null)
+            canvasPanel.SetGreen();
 
         Debug.Log("Panel Engranajes completado!");
-        // GameManager.Instance.OnMiniGameCompleted();
     }
 }
