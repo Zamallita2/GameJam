@@ -21,15 +21,19 @@ public class MachineInteraction : MonoBehaviour
     public bool mostrarLogs = true;
 
     private bool panelActivo = false;
+    private bool maquinaReparada = false;
 
     private MachineType machineType;
     private PanelLoader panelLoader;
     private HandManager handManager;
     private PlayerPanelVisibility playerPanelVisibility;
+    private MachineGlow machineGlow;
 
     void Awake()
     {
         machineType = GetComponent<MachineType>();
+        machineGlow = GetComponent<MachineGlow>();
+
         AutoAssignReferences();
     }
 
@@ -73,6 +77,8 @@ public class MachineInteraction : MonoBehaviour
 
     void Update()
     {
+        if (maquinaReparada) return;
+
         if (player == null || panelRoot == null || panelCamera == null || playerCamera == null || machineType == null)
         {
             if (mostrarLogs)
@@ -117,6 +123,20 @@ public class MachineInteraction : MonoBehaviour
         if (panelLoader != null)
             panelLoader.CargarPanel(machineType.tipo, machineType.nivel);
 
+        // 🔥 ASIGNAR MACHINE OWNER A TODOS LOS PANELES
+        SimonButtonsPanel simon = panelRoot.GetComponentInChildren<SimonButtonsPanel>(true);
+        if (simon != null)
+            simon.SetMachineOwner(this);
+
+        CablesPanel cables = panelRoot.GetComponentInChildren<CablesPanel>(true);
+        if (cables != null)
+            cables.SetMachineOwner(this);
+
+        Game puzzle = panelRoot.GetComponentInChildren<Game>(true);
+        if (puzzle != null)
+            puzzle.SetMachineOwner(this);
+
+        // MANO
         if (handManager != null)
         {
             if (panelHand != null && panelPointer != null)
@@ -173,6 +193,59 @@ public class MachineInteraction : MonoBehaviour
             if (movement != null)
                 movement.enabled = true;
         }
+    }
+
+    public void CerrarPanelDesdeMinijuego()
+    {
+        DesactivarPanel();
+    }
+
+    public void MarcarMaquinaReparada()
+    {
+        if (maquinaReparada) return;
+
+        maquinaReparada = true;
+
+        // 🔥 APAGAR BRILLO
+        if (machineGlow != null)
+            machineGlow.StopGlow();
+
+        // 🔥 ACTUALIZAR OBJETIVOS
+        ObjectivesHUD hud = ObjectivesHUD.Instance;
+
+        if (hud == null)
+            hud = FindAnyObjectByType<ObjectivesHUD>();
+
+        if (hud != null && machineType != null)
+        {
+            switch (machineType.tipo)
+            {
+                case MachineType.TipoMaquina.Botones:
+                    hud.CompleteBotones();
+                    break;
+
+                case MachineType.TipoMaquina.Cables:
+                    hud.CompleteCables();
+                    break;
+
+              
+
+                case MachineType.TipoMaquina.Puzzle:
+                    hud.CompletePuzzle();
+                    break;
+            }
+        }
+
+        // 🔥 CONTADOR DE NIVEL
+        LevelOneCompletionManager manager = LevelOneCompletionManager.Instance;
+
+        if (manager == null)
+            manager = FindAnyObjectByType<LevelOneCompletionManager>();
+
+        if (manager != null)
+            manager.RegisterMachineRepaired();
+
+        Debug.Log($"[MachineInteraction] Máquina reparada: {gameObject.name}");
     }
 
     void OnDrawGizmosSelected()

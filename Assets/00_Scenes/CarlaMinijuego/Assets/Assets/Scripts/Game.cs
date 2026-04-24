@@ -7,6 +7,9 @@ public class Game : MonoBehaviour
     [Header("Centro del puzzle")]
     public Transform puzzleCenter;
 
+    [Header("Máquina dueña")]
+    public MachineInteraction machineOwner;
+
     [Header("Piezas en orden")]
     public GameObject[] go;
 
@@ -26,6 +29,9 @@ public class Game : MonoBehaviour
     public Camera puzzleCamera;
     public float maxScreenClickDistance = 80f;
 
+    [Header("Final")]
+    public float closePanelDelay = 1f;
+
     private Vector3 screenPositionToAnimate;
     private Piece pieceToAnimate;
     private int toAnimateI;
@@ -34,8 +40,24 @@ public class Game : MonoBehaviour
     public Piece[,] Matrix = new Piece[Constants.MaxColumns, Constants.MaxRows];
     private GameState gameState;
 
-    void Start()
+    private bool completed = false;
+    private bool initialized = false;
+
+    void OnEnable()
     {
+        InitPuzzle();
+    }
+
+    public void SetMachineOwner(MachineInteraction owner)
+    {
+        machineOwner = owner;
+    }
+
+    void InitPuzzle()
+    {
+        completed = false;
+        initialized = false;
+
         if (puzzleCenter == null)
         {
             Debug.LogError("[Game] Falta asignar puzzleCenter.");
@@ -45,7 +67,7 @@ public class Game : MonoBehaviour
 
         if (go == null || go.Length != Constants.MaxSize)
         {
-            Debug.LogError("[Game] Debes asignar exactamente 9 piezas en el array go.");
+            Debug.LogError("[Game] Debes asignar exactamente 9 piezas.");
             enabled = false;
             return;
         }
@@ -53,23 +75,23 @@ public class Game : MonoBehaviour
         if (puzzleCamera == null)
             puzzleCamera = Camera.main;
 
-        gameState = GameState.Start;
-
         PreparePieces();
         BuildMatrix();
         RefreshAllPiecePositions();
+
+        gameState = GameState.Start;
+        initialized = true;
     }
 
     void Update()
     {
+        if (!initialized || completed) return;
+
         switch (gameState)
         {
             case GameState.Start:
-                if (Input.GetMouseButtonUp(0))
-                {
-                    Shuffle();
-                    gameState = GameState.Playing;
-                }
+                Shuffle();
+                gameState = GameState.Playing;
                 break;
 
             case GameState.Playing:
@@ -86,25 +108,18 @@ public class Game : MonoBehaviour
         }
     }
 
-    void OnGUI()
-    {
-        switch (gameState)
-        {
-            case GameState.Start:
-                GUI.Label(new Rect(10, 10, 220, 30), "Tap para empezar");
-                break;
-
-            case GameState.End:
-                GUI.Label(new Rect(10, 10, 260, 30), "Puzzle completado");
-                break;
-        }
-    }
-
     private void PreparePieces()
     {
         SetPiecesScale(pieceScale);
 
+        for (int i = 0; i < go.Length; i++)
+        {
+            if (go[i] != null)
+                go[i].SetActive(true);
+        }
+
         int emptyIndex = Constants.MaxSize - 1;
+
         if (go[emptyIndex] != null)
             go[emptyIndex].SetActive(false);
     }
@@ -152,9 +167,7 @@ public class Game : MonoBehaviour
             for (int j = 0; j < Constants.MaxRows; j++)
             {
                 if (Matrix[i, j] != null)
-                {
                     Matrix[i, j].GameObject.transform.position = GetBoardPosition(i, j);
-                }
             }
         }
     }
@@ -184,8 +197,8 @@ public class Game : MonoBehaviour
 
         for (int move = 0; move < shuffleMoves; move++)
         {
-            int emptyI = -1;
-            int emptyJ = -1;
+            int emptyI;
+            int emptyJ;
 
             FindEmptyCell(out emptyI, out emptyJ);
 
@@ -203,6 +216,8 @@ public class Game : MonoBehaviour
             if (emptyJ < Constants.MaxRows - 1 && lastMove != Vector2Int.left)
                 possibleMoves.Add(Vector2Int.right);
 
+            if (possibleMoves.Count == 0) return;
+
             Vector2Int dir = possibleMoves[Random.Range(0, possibleMoves.Count)];
 
             int targetI = emptyI;
@@ -217,25 +232,7 @@ public class Game : MonoBehaviour
             lastMove = dir;
         }
 
-        MoveEmptyToBottomRight();
-    }
-
-    private void MoveEmptyToBottomRight()
-    {
-        int finalEmptyI, finalEmptyJ;
-        FindEmptyCell(out finalEmptyI, out finalEmptyJ);
-
-        while (finalEmptyI < Constants.MaxColumns - 1)
-        {
-            Swap(finalEmptyI + 1, finalEmptyJ, finalEmptyI, finalEmptyJ);
-            finalEmptyI++;
-        }
-
-        while (finalEmptyJ < Constants.MaxRows - 1)
-        {
-            Swap(finalEmptyI, finalEmptyJ + 1, finalEmptyI, finalEmptyJ);
-            finalEmptyJ++;
-        }
+        RefreshAllPiecePositions();
     }
 
     private void FindEmptyCell(out int emptyI, out int emptyJ)
@@ -257,14 +254,11 @@ public class Game : MonoBehaviour
         }
     }
 
-    private void Swap(int i, int j, int randomI, int randomJ)
+    private void Swap(int i, int j, int targetI, int targetJ)
     {
-        if (Matrix[i, j] == null && Matrix[randomI, randomJ] == null)
-            return;
-
         Piece temp = Matrix[i, j];
-        Matrix[i, j] = Matrix[randomI, randomJ];
-        Matrix[randomI, randomJ] = temp;
+        Matrix[i, j] = Matrix[targetI, targetJ];
+        Matrix[targetI, targetJ] = temp;
 
         if (Matrix[i, j] != null)
         {
@@ -273,11 +267,11 @@ public class Game : MonoBehaviour
             Matrix[i, j].CurrentJ = j;
         }
 
-        if (Matrix[randomI, randomJ] != null)
+        if (Matrix[targetI, targetJ] != null)
         {
-            Matrix[randomI, randomJ].GameObject.transform.position = GetBoardPosition(randomI, randomJ);
-            Matrix[randomI, randomJ].CurrentI = randomI;
-            Matrix[randomI, randomJ].CurrentJ = randomJ;
+            Matrix[targetI, targetJ].GameObject.transform.position = GetBoardPosition(targetI, targetJ);
+            Matrix[targetI, targetJ].CurrentI = targetI;
+            Matrix[targetI, targetJ].CurrentJ = targetJ;
         }
     }
 
@@ -298,7 +292,6 @@ public class Game : MonoBehaviour
         int jFound = -1;
         float bestDistance = float.MaxValue;
 
-        // Buscar la pieza visible más cercana al click en pantalla
         for (int i = 0; i < Constants.MaxColumns; i++)
         {
             for (int j = 0; j < Constants.MaxRows; j++)
@@ -326,33 +319,21 @@ public class Game : MonoBehaviour
         }
 
         if (iFound == -1 || jFound == -1)
-        {
-            Debug.Log("No encontré pieza válida");
             return;
-        }
 
         if (bestDistance > maxScreenClickDistance)
-        {
-            Debug.Log($"Click demasiado lejos de una pieza. Distancia={bestDistance}");
             return;
-        }
 
-        Debug.Log($"Pieza seleccionada por cercanía: ({iFound},{jFound}) DistanciaPantalla={bestDistance}");
+        int emptyI;
+        int emptyJ;
 
-        int emptyI, emptyJ;
         FindEmptyCell(out emptyI, out emptyJ);
-
-        if (emptyI == -1 || emptyJ == -1)
-        {
-            Debug.Log("No se encontró espacio vacío");
-            return;
-        }
 
         int manhattanDistance = Mathf.Abs(iFound - emptyI) + Mathf.Abs(jFound - emptyJ);
 
         if (manhattanDistance != 1)
         {
-            Debug.Log($"La pieza no está junto al espacio vacío. Pieza=({iFound},{jFound}) Vacío=({emptyI},{emptyJ})");
+            Debug.Log($"Movimiento inválido. Pieza=({iFound},{jFound}) Vacío=({emptyI},{emptyJ})");
             return;
         }
 
@@ -412,8 +393,24 @@ public class Game : MonoBehaviour
             }
         }
 
+        completed = true;
         gameState = GameState.End;
+
         Debug.Log("PUZZLE COMPLETADO");
-        transform.root.gameObject.SetActive(false);
+
+        Invoke(nameof(CompletePanel), closePanelDelay);
+    }
+
+    void CompletePanel()
+    {
+        if (machineOwner != null)
+        {
+            machineOwner.MarcarMaquinaReparada();
+            machineOwner.CerrarPanelDesdeMinijuego();
+        }
+        else
+        {
+            Debug.LogWarning("[Game] No hay MachineOwner asignado.");
+        }
     }
 }
