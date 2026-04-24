@@ -19989,6 +19989,8 @@ GameObject:
   - component: {fileID: 1349090228}
   - component: {fileID: 1349090231}
   - component: {fileID: 1349090230}
+  - component: {fileID: 1349090233}
+  - component: {fileID: 1349090232}
   m_Layer: 0
   m_Name: TimeManager
   m_TagString: Untagged
@@ -20059,6 +20061,27 @@ MonoBehaviour:
   cameraController: {fileID: 1700552059}
   thirdPersonBody: {fileID: 624178844}
   firstPersonArms: {fileID: 939251503}
+--- !u!81 &1349090232
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1349090227}
+  m_Enabled: 1
+--- !u!114 &1349090233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1349090227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0f5049d2c6deb92e85b217a0f338a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FollowPlayer
+  player: {fileID: 1041237334}
 --- !u!1001 &1356577106
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24780,7 +24803,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700552054}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1700552058
 Camera:
   m_ObjectHideFlags: 0
