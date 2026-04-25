@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LevelOneIntro : MonoBehaviour
+public class LevelTwoIntro : MonoBehaviour
 {
     [Header("Player")]
     public PlayerMovement playerMovement;
@@ -57,7 +57,10 @@ public class LevelOneIntro : MonoBehaviour
 
         if (playIntroOnStart)
             IniciarIntro();
+            Debug.Log("Inicioa");
+        Debug.Log("Awake");
     }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
