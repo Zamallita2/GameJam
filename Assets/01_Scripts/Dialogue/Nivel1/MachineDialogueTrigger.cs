@@ -7,7 +7,8 @@ public class MachineDialogueTrigger : MonoBehaviour
         Botones,
         Cables,
         Puzzle,
-        Gear
+        Gear,
+        Arrows
     }
 
     [Header("Tipo de diálogo")]
@@ -27,6 +28,7 @@ public class MachineDialogueTrigger : MonoBehaviour
     private LevelOneDialogueController levelOneDialogue;
     private LevelTwoDialogueController levelTwoDialogue;
     private LevelThreeDialogueController levelThreeDialogue;
+    private LevelFourDialogueController levelFourDialogue;
 
     void Start()
     {
@@ -39,6 +41,7 @@ public class MachineDialogueTrigger : MonoBehaviour
         levelOneDialogue = FindAnyObjectByType<LevelOneDialogueController>();
         levelTwoDialogue = FindAnyObjectByType<LevelTwoDialogueController>();
         levelThreeDialogue = FindAnyObjectByType<LevelThreeDialogueController>();
+        levelFourDialogue = FindAnyObjectByType<LevelFourDialogueController>();
     }
 
     void BuscarPlayer()
@@ -73,6 +76,12 @@ public class MachineDialogueTrigger : MonoBehaviour
 
     void EjecutarDialogo()
     {
+        if (levelFourDialogue != null)
+        {
+            EjecutarNivelCuatro();
+            return;
+        }
+
         if (levelThreeDialogue != null)
         {
             EjecutarNivelTres();
@@ -90,9 +99,6 @@ public class MachineDialogueTrigger : MonoBehaviour
             EjecutarNivelUno();
             return;
         }
-
-        if (mostrarLogs)
-            Debug.LogWarning("[MachineDialogueTrigger] No hay controlador de diálogos.");
     }
 
     void EjecutarNivelUno()
@@ -109,11 +115,6 @@ public class MachineDialogueTrigger : MonoBehaviour
 
             case MachineDialogueType.Puzzle:
                 levelOneDialogue.PuzzleIntro();
-                break;
-
-            case MachineDialogueType.Gear:
-                if (mostrarLogs)
-                    Debug.LogWarning("[MachineDialogueTrigger] Gear no existe en Nivel 1.");
                 break;
         }
     }
@@ -152,6 +153,26 @@ public class MachineDialogueTrigger : MonoBehaviour
 
             case MachineDialogueType.Gear:
                 levelThreeDialogue.GearIntro();
+                break;
+        }
+    }
+
+    void EjecutarNivelCuatro()
+    {
+        switch (type)
+        {
+            case MachineDialogueType.Botones:
+            case MachineDialogueType.Cables:
+            case MachineDialogueType.Puzzle:
+                levelFourDialogue.ModuloActivo();
+                break;
+
+            case MachineDialogueType.Gear:
+                levelFourDialogue.GearIntro();
+                break;
+
+            case MachineDialogueType.Arrows:
+                levelFourDialogue.ArrowsIntro();
                 break;
         }
     }

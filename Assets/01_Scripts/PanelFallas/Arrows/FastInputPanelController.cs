@@ -34,7 +34,7 @@ public class FastInputPanelController : MonoBehaviour
     public List<PromptVisualEntry> promptVisuals = new List<PromptVisualEntry>();
 
     [Header("Lámparas")]
-    public List<StatusLamp> statusLamps = new List<StatusLamp>();
+    public List<StatusLampa> statusLamps = new List<StatusLampa>();
 
     [Header("Cámara")]
     public Camera inputCamera;
@@ -65,6 +65,9 @@ public class FastInputPanelController : MonoBehaviour
     public AudioClip wrongSound;
     public AudioClip correctSound;
 
+    [Header("Final")]
+    public float closePanelDelay = 1f;
+
     [Header("Debug")]
     public int currentScore = 0;
     public float currentTime = 0f;
@@ -74,7 +77,10 @@ public class FastInputPanelController : MonoBehaviour
     private bool canPlay = false;
     private bool isRunning = false;
     private bool isFailing = false;
+    private bool isCompleted = false;
+
     private Coroutine spawnRoutine;
+    private MachineInteraction machineOwner;
 
     void Awake()
     {
@@ -88,15 +94,86 @@ public class FastInputPanelController : MonoBehaviour
             inputCamera = Camera.main;
     }
 
-    void Start()
+    void OnEnable()
     {
         if (iniciarAutomaticamente)
             Setup(nivelPrueba);
     }
 
+    void OnDisable()
+    {
+        StopAllCoroutines();
+        ClearAllPrompts();
+    }
+
+    public void SetMachineOwner(MachineInteraction owner)
+    {
+        machineOwner = owner;
+    }
+
+    public void Setup(int level)
+    {
+        StopAllCoroutines();
+        ClearAllPrompts();
+
+        canPlay = false;
+        isRunning = false;
+        isFailing = false;
+        isCompleted = false;
+
+        currentScore = 0;
+        currentTime = timeLimit + ((level - 1) * 5f);
+
+        moveSpeed = 0.1f + ((level - 1) * 0.075f);
+        spawnInterval = Mathf.Max(0.35f, 0.75f - ((level - 1) * 0.05f));
+
+        SetLampsNeutral();
+
+        foreach (var button in inputButtons)
+        {
+            if (button != null)
+                button.SetIdle();
+        }
+
+        if (!HasValidPromptReferences())
+        {
+            Debug.LogWarning("[FastInputPanel] Faltan referencias.");
+            return;
+        }
+
+        StartCoroutine(BeginRoutine());
+    }
+
+    bool HasValidPromptReferences()
+    {
+        if (promptPrefab == null || promptContainer == null)
+            return false;
+
+        if (lanes == null || lanes.Count == 0)
+            return false;
+
+        foreach (var lane in lanes)
+        {
+            if (lane == null || lane.spawnPoint == null || lane.missPoint == null)
+                return false;
+        }
+
+        return true;
+    }
+
+    IEnumerator BeginRoutine()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        canPlay = true;
+        isRunning = true;
+
+        spawnRoutine = StartCoroutine(SpawnRoutine());
+    }
+
     void Update()
     {
-        if (!isRunning || isFailing)
+        if (!isRunning || isFailing || isCompleted)
             return;
 
         currentTime -= Time.deltaTime;
@@ -126,86 +203,17 @@ public class FastInputPanelController : MonoBehaviour
                 FastInputButton3D clickedButton = hit.collider.GetComponentInParent<FastInputButton3D>();
 
                 if (clickedButton != null)
-                {
                     OnButtonPressed(clickedButton);
-                }
             }
         }
-    }
-
-    public void Setup(int level)
-    {
-        StopAllCoroutines();
-        ClearAllPrompts();
-
-        canPlay = false;
-        isRunning = false;
-        isFailing = false;
-
-        currentScore = 0;
-
-        // tiempo por nivel
-        currentTime = timeLimit + ((level - 1) * 5f);
-
-        // velocidad por nivel
-        moveSpeed = 1.2f + ((level - 1) * 0.15f);
-
-        // intervalo por nivel (más rápido en niveles altos)
-        spawnInterval = Mathf.Max(0.35f, 0.75f - ((level - 1) * 0.05f));
-
-        SetLampsNeutral();
-
-        foreach (var button in inputButtons)
-        {
-            if (button != null)
-                button.SetIdle();
-        }
-
-        if (!HasValidPromptReferences())
-        {
-            Debug.LogWarning("FastInputPanelController: faltan referencias del prompt.");
-            return;
-        }
-
-        StartCoroutine(BeginRoutine());
-    }
-
-    bool HasValidPromptReferences()
-    {
-        if (promptPrefab == null || promptContainer == null)
-            return false;
-
-        if (lanes == null || lanes.Count == 0)
-            return false;
-
-        for (int i = 0; i < lanes.Count; i++)
-        {
-            if (lanes[i] == null) return false;
-            if (lanes[i].spawnPoint == null || lanes[i].missPoint == null)
-                return false;
-        }
-
-        return true;
-    }
-
-    IEnumerator BeginRoutine()
-    {
-        yield return new WaitForSeconds(0.4f);
-
-        canPlay = true;
-        isRunning = true;
-
-        spawnRoutine = StartCoroutine(SpawnRoutine());
     }
 
     IEnumerator SpawnRoutine()
     {
-        while (isRunning)
+        while (isRunning && !isCompleted)
         {
             if (activePrompts.Count < maxPromptsOnScreen)
-            {
                 SpawnRandomPrompt();
-            }
 
             yield return new WaitForSeconds(spawnInterval);
         }
@@ -216,12 +224,10 @@ public class FastInputPanelController : MonoBehaviour
         PromptLane lane = GetRandomLane();
 
         if (lane == null || lane.spawnPoint == null || lane.missPoint == null)
-        {
-            Debug.LogWarning("No hay carriles bien configurados.");
             return;
-        }
 
         FastInputButton3D.ColorSymbol colorSymbol = GetRandomColor();
+
         FastInputPrompt3D.PromptType promptType =
             Random.value <= arrowChance
             ? FastInputPrompt3D.PromptType.Arrow
@@ -239,9 +245,9 @@ public class FastInputPanelController : MonoBehaviour
         obj.transform.localScale = Vector3.one * promptScale;
 
         FastInputPrompt3D prompt = obj.GetComponent<FastInputPrompt3D>();
+
         if (prompt == null)
         {
-            Debug.LogWarning("El promptPrefab no tiene FastInputPrompt3D.");
             Destroy(obj);
             return;
         }
@@ -258,41 +264,9 @@ public class FastInputPanelController : MonoBehaviour
         activePrompts.Add(prompt);
     }
 
-    FastInputButton3D.ColorSymbol GetRandomColor()
-    {
-        List<FastInputButton3D.ColorSymbol> pool = new List<FastInputButton3D.ColorSymbol>()
-        {
-            FastInputButton3D.ColorSymbol.Red,
-            FastInputButton3D.ColorSymbol.Blue,
-            FastInputButton3D.ColorSymbol.Green,
-            FastInputButton3D.ColorSymbol.Pink
-        };
-
-        return pool[Random.Range(0, pool.Count)];
-    }
-
-    PromptLane GetRandomLane()
-    {
-        if (lanes == null || lanes.Count == 0)
-            return null;
-
-        return lanes[Random.Range(0, lanes.Count)];
-    }
-
-    Material GetMaterialFor(FastInputButton3D.ColorSymbol colorSymbol, FastInputPrompt3D.PromptType promptType)
-    {
-        foreach (var entry in promptVisuals)
-        {
-            if (entry.symbol == colorSymbol && entry.promptType == promptType)
-                return entry.material;
-        }
-
-        return null;
-    }
-
     void OnButtonPressed(FastInputButton3D button)
     {
-        if (button == null || activePrompts.Count == 0 || isFailing)
+        if (button == null || activePrompts.Count == 0 || isFailing || isCompleted)
             return;
 
         button.TriggerVisualPress();
@@ -306,9 +280,13 @@ public class FastInputPanelController : MonoBehaviour
         }
 
         bool sameColor = expectedPrompt.symbol == button.symbol;
+
         bool sameType =
-            (expectedPrompt.promptType == FastInputPrompt3D.PromptType.Arrow && button.buttonType == FastInputButton3D.ButtonVisualType.Arrow) ||
-            (expectedPrompt.promptType == FastInputPrompt3D.PromptType.Circle && button.buttonType == FastInputButton3D.ButtonVisualType.Circle);
+            (expectedPrompt.promptType == FastInputPrompt3D.PromptType.Arrow &&
+             button.buttonType == FastInputButton3D.ButtonVisualType.Arrow)
+            ||
+            (expectedPrompt.promptType == FastInputPrompt3D.PromptType.Circle &&
+             button.buttonType == FastInputButton3D.ButtonVisualType.Circle);
 
         if (!sameColor || !sameType)
         {
@@ -323,17 +301,14 @@ public class FastInputPanelController : MonoBehaviour
         StartCoroutine(button.FlashPressed(0.12f));
 
         currentScore += scorePerHit;
-        Debug.Log($"Score: {currentScore}/{targetScore} | Time: {currentTime:F1}");
 
         if (currentScore >= targetScore)
-        {
             StartCoroutine(SuccessRoutine());
-        }
     }
 
     public void OnPromptMissed(FastInputPrompt3D prompt)
     {
-        if (!isRunning || isFailing)
+        if (!isRunning || isFailing || isCompleted)
             return;
 
         if (activePrompts.Contains(prompt))
@@ -346,12 +321,11 @@ public class FastInputPanelController : MonoBehaviour
         }
 
         currentScore = Mathf.Max(0, currentScore - penaltyOnMiss);
-        Debug.Log($"Se escapó uno. Score: {currentScore}/{targetScore} | Time: {currentTime:F1}");
     }
 
     IEnumerator FailRoutine()
     {
-        if (isFailing) yield break;
+        if (isFailing || isCompleted) yield break;
 
         isFailing = true;
         isRunning = false;
@@ -364,6 +338,10 @@ public class FastInputPanelController : MonoBehaviour
 
         if (audioSource != null && wrongSound != null)
             audioSource.PlayOneShot(wrongSound);
+
+        LevelFourDialogueController dialogue = FindAnyObjectByType<LevelFourDialogueController>();
+        if (dialogue != null)
+            dialogue.ArrowsError();
 
         foreach (var button in inputButtons)
         {
@@ -379,22 +357,39 @@ public class FastInputPanelController : MonoBehaviour
 
     IEnumerator SuccessRoutine()
     {
+        if (isCompleted) yield break;
+
+        isCompleted = true;
         isRunning = false;
         canPlay = false;
+        isFailing = false;
 
         if (spawnRoutine != null)
             StopCoroutine(spawnRoutine);
 
+        ClearAllPrompts();
         SetLampsCorrect();
 
         if (audioSource != null && correctSound != null)
             audioSource.PlayOneShot(correctSound);
 
-        yield return new WaitForSeconds(1f);
+        LevelFourDialogueController dialogue = FindAnyObjectByType<LevelFourDialogueController>();
+        if (dialogue != null)
+            dialogue.ArrowsExito();
+
+        yield return new WaitForSeconds(closePanelDelay);
 
         SetLampsNeutral();
 
-        Debug.Log("Ganaste el minijuego");
+        if (machineOwner != null)
+        {
+            machineOwner.MarcarMaquinaReparada();
+            machineOwner.CerrarPanelDesdeMinijuego();
+        }
+        else
+        {
+            Debug.LogWarning("[FastInputPanel] No tiene MachineOwner.");
+        }
     }
 
     void ClearAllPrompts()
@@ -402,9 +397,7 @@ public class FastInputPanelController : MonoBehaviour
         if (promptContainer != null)
         {
             for (int i = promptContainer.childCount - 1; i >= 0; i--)
-            {
                 Destroy(promptContainer.GetChild(i).gameObject);
-            }
         }
 
         activePrompts.Clear();
@@ -435,5 +428,35 @@ public class FastInputPanelController : MonoBehaviour
             if (lamp != null)
                 lamp.SetWrong();
         }
+    }
+
+    FastInputButton3D.ColorSymbol GetRandomColor()
+    {
+        int r = Random.Range(0, 4);
+
+        if (r == 0) return FastInputButton3D.ColorSymbol.Red;
+        if (r == 1) return FastInputButton3D.ColorSymbol.Blue;
+        if (r == 2) return FastInputButton3D.ColorSymbol.Green;
+
+        return FastInputButton3D.ColorSymbol.Pink;
+    }
+
+    PromptLane GetRandomLane()
+    {
+        if (lanes == null || lanes.Count == 0)
+            return null;
+
+        return lanes[Random.Range(0, lanes.Count)];
+    }
+
+    Material GetMaterialFor(FastInputButton3D.ColorSymbol colorSymbol, FastInputPrompt3D.PromptType promptType)
+    {
+        foreach (var entry in promptVisuals)
+        {
+            if (entry.symbol == colorSymbol && entry.promptType == promptType)
+                return entry.material;
+        }
+
+        return null;
     }
 }

@@ -1262,7 +1262,7 @@ GameObject:
   - component: {fileID: 408266506}
   - component: {fileID: 408266509}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: CameraArrow
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1310,7 +1310,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -4350,6 +4350,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   wrongSound: {fileID: 0}
   correctSound: {fileID: 0}
+  closePanelDelay: 1
   currentScore: 100
   currentTime: 20
 --- !u!1 &1731061192
@@ -4957,7 +4958,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1682201916053281453, guid: 87c3e077ca918b24abd4259198ce4940, type: 3}
       propertyPath: m_Name
-      value: PanelRoot
+      value: PanelArrows
       objectReference: {fileID: 0}
     - target: {fileID: 3350637847862276102, guid: 87c3e077ca918b24abd4259198ce4940, type: 3}
       propertyPath: m_LocalPosition.x

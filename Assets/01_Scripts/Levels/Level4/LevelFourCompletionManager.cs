@@ -5,17 +5,17 @@ public class LevelFourCompletionManager : MonoBehaviour
 {
     public static LevelFourCompletionManager Instance;
 
-    [Header("Cantidad de m�quinas a reparar")]
-    public int totalMachines = 4;
+    [Header("Cantidad de máquinas a reparar")]
+    public int totalMachines = 5;
 
     [Header("Luces")]
-    public float lightDisableRadius = 1f;
+    public float lightDisableRadius = 5f;
 
     [Header("Siguiente escena")]
-    public string nextSceneName = "Nivel2";
+    public string nextSceneName = "Nivel5";
     public float delayBeforeNextScene = 6f;
 
-    [Header("Audio final opcional")]
+    [Header("Audio final")]
     public AudioClip finalVoice;
 
     private int repairedMachines = 0;
@@ -30,10 +30,7 @@ public class LevelFourCompletionManager : MonoBehaviour
 
     void Start()
     {
-        // encuentra TODAS las luces autom�ticamente
-        allLights = FindObjectsByType<LightFlicker>(
-            FindObjectsSortMode.None
-        );
+        allLights = FindObjectsByType<LightFlicker>(FindObjectsSortMode.None);
     }
 
     public void RegisterMachineRepaired(Transform machine)
@@ -42,17 +39,12 @@ public class LevelFourCompletionManager : MonoBehaviour
 
         repairedMachines++;
 
-        Debug.Log(
-            $"[LevelTwoCompletion] M�quinas reparadas: " +
-            $"{repairedMachines}/{totalMachines}"
-        );
+        Debug.Log("[LevelFourCompletion] Máquinas reparadas: " + repairedMachines + "/" + totalMachines);
 
         DisableNearbyLights(machine);
 
         if (repairedMachines >= totalMachines)
-        {
             FinishLevel();
-        }
     }
 
     void DisableNearbyLights(Transform machine)
@@ -62,16 +54,10 @@ public class LevelFourCompletionManager : MonoBehaviour
             if (light == null || light.isTurnedOff)
                 continue;
 
-            float distance =
-                Vector3.Distance(
-                    machine.position,
-                    light.transform.position
-                );
+            float distance = Vector3.Distance(machine.position, light.transform.position);
 
             if (distance <= lightDisableRadius)
-            {
                 light.TurnOff();
-            }
         }
     }
 
@@ -79,16 +65,16 @@ public class LevelFourCompletionManager : MonoBehaviour
     {
         levelFinished = true;
 
-        DialogueManager dm =
-            FindAnyObjectByType<DialogueManager>();
+        TimeManager time = FindAnyObjectByType<TimeManager>();
+        if (time != null)
+            time.timerPausado = true;
+
+        DialogueManager dm = FindAnyObjectByType<DialogueManager>();
 
         if (dm != null)
         {
             dm.ShowMessage(
-                "Todos los m�dulos han sido restaurados. " +
-                "El sistema vuelve a estar estable. " +
-                "Excelente trabajo, operador. " +
-                "Preparando siguiente zona...",
+                "Área pesada estabilizada.\nEl núcleo aún resiste.\nPreparando acceso al último nivel...",
                 finalVoice
             );
         }

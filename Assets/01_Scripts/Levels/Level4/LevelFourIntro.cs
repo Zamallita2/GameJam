@@ -11,17 +11,13 @@ public class LevelFourIntro : MonoBehaviour
     public float extraSinAudio = 2.5f;
 
     [Header("Audios de introducción")]
-    public AudioClip audioConexionProduccion;
-    public AudioClip audioPrimerSector;
-    public AudioClip audioFallaExtendida;
-    public AudioClip audioAreaProduccion;
-    public AudioClip audioMasModulos;
-    public AudioClip audioSistemasConocidos;
-    public AudioClip audioNoRepetire;
-    public AudioClip audioNuevaFalla;
-    public AudioClip audioEngranajes;
-    public AudioClip audioReparaModulos;
-    public AudioClip audioAvanzaCuidado;
+    public AudioClip audioZonaPesada;
+    public AudioClip audioSistemasLentos;
+    public AudioClip audioFallasCriticas;
+    public AudioClip audioNuevaRespuesta;
+    public AudioClip audioNoHabraTiempo;
+    public AudioClip audioPenalizacion;
+    public AudioClip audioSigueOperador;
 
     private DialogueManager dm;
     private int pasoActual = 0;
@@ -39,32 +35,24 @@ public class LevelFourIntro : MonoBehaviour
 
         textos = new string[]
         {
-            "Operador, conexión establecida con la zona de producción.",
-            "El primer sector fue restaurado correctamente.",
-            "Pero la falla se ha extendido.",
-            "Esta área controla procesos básicos de producción.",
-            "Encontrarás más módulos dañados.",
-            "Algunos sistemas ya los conoces.",
-            "No repetiré instrucciones anteriores.",
-            "Sin embargo, se detectó una nueva falla mecánica.",
-            "Los engranajes de sincronización están fuera de posición.",
-            "Repara los módulos activos antes de que el núcleo pierda estabilidad.",
-            "Avanza con cuidado, operador."
+            "Operador...\nacceso concedido al área pesada.",
+            "Los sistemas aquí son más lentos...\npero sus fallas son críticas.",
+            "Un error puede comprometer todo el núcleo.",
+            "Se detectó un nuevo módulo de respuesta rápida.",
+            "Los símbolos caerán en pantalla.\nDebes responder antes de que lleguen al límite.",
+            "La penalización por fallar será mayor.",
+            "Sigue avanzando, operador."
         };
 
         audios = new AudioClip[]
         {
-            audioConexionProduccion,
-            audioPrimerSector,
-            audioFallaExtendida,
-            audioAreaProduccion,
-            audioMasModulos,
-            audioSistemasConocidos,
-            audioNoRepetire,
-            audioNuevaFalla,
-            audioEngranajes,
-            audioReparaModulos,
-            audioAvanzaCuidado
+            audioZonaPesada,
+            audioSistemasLentos,
+            audioFallasCriticas,
+            audioNuevaRespuesta,
+            audioNoHabraTiempo,
+            audioPenalizacion,
+            audioSigueOperador
         };
 
         if (playIntroOnStart)
@@ -129,7 +117,7 @@ public class LevelFourIntro : MonoBehaviour
         if (playerMovement != null)
             playerMovement.SetCanMove(true);
 
-        TimeManager time = FindFirstObjectByType<TimeManager>();
+        TimeManager time = FindAnyObjectByType<TimeManager>();
         if (time != null)
             time.Iniciar();
     }
