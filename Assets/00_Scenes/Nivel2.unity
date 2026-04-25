@@ -2641,7 +2641,7 @@ MonoBehaviour:
   targetPrefab: {fileID: 2386517128196464931, guid: 14474902cb29f7166ac04530cd167bbc, type: 3}
   panelCamera: {fileID: 1944737974}
   machineOwner: {fileID: 1202972304}
-  cableCount: 5
+  cableCount: 8
   topLeft: {fileID: 1565731858}
   bottomRight: {fileID: 1865754700}
   minDistance: 0.1
@@ -2707,7 +2707,7 @@ MonoBehaviour:
   pieceScale: 0.45
   pieceSpacing: 0.2
   AnimSpeed: 10
-  shuffleMoves: 5
+  shuffleMoves: 8
   puzzleCamera: {fileID: 260399599}
   maxScreenClickDistance: 80
   closePanelDelay: 1
@@ -4895,6 +4895,7 @@ MonoBehaviour:
   interactionPoint: {fileID: 1784064583}
   distance: 1.1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 1
 --- !u!1 &273639086
 GameObject:
   m_ObjectHideFlags: 0
@@ -6405,12 +6406,12 @@ MonoBehaviour:
   - {fileID: 981058161}
   - {fileID: 16380250}
   statusLamp: {fileID: 363700523}
-  machineOwner: {fileID: 0}
+  machineOwner: {fileID: 726666412}
   nivelPrueba: 1
   iniciarAutomaticamente: 1
-  secuenciasParaCompletar: 3
+  secuenciasParaCompletar: 4
   baseSequenceLength: 4
-  aumentoPorSecuencia: 1
+  aumentoPorSecuencia: 2
   maxSequenceLength: 10
   showDelay: 0.5
   pauseBetween: 0.1
@@ -8455,23 +8456,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087b02f6edf9b27ae883afb820f3a3f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelTwoDialogueController
-  audioTutorial: {fileID: 8300000, guid: 4fb87bf525ff62148bf36da4df8b087a, type: 3}
-  audioAlerta: {fileID: 8300000, guid: af19a2b2f4133da49af94ac0e8dba4d9, type: 3}
-  audioBotonesIntro: {fileID: 8300000, guid: 3b0f58e231d769a47bdd83b1a73d773c, type: 3}
-  audioBotonesDurante: {fileID: 8300000, guid: 781dc11227a4f94438fb144fd3dc5ac3, type: 3}
-  audioBotonesError: {fileID: 8300000, guid: e63a2e6a3f7c2184cbf4e362c5dd11b4, type: 3}
-  audioBotonesExito: {fileID: 8300000, guid: 96082f9ce0f00024796908186ed79e8a, type: 3}
-  audioCablesIntro: {fileID: 8300000, guid: f068b2a30d52fae40be728ec2a3cf882, type: 3}
-  audioCablesDurante: {fileID: 8300000, guid: 8c2bc68b196f9df4396f34b785d8a9b1, type: 3}
-  audioCablesError: {fileID: 8300000, guid: 18c31c6a277e9884fa3664b1802a134f, type: 3}
-  audioCablesExito: {fileID: 8300000, guid: 197c46f1d1bfdbc409f37bcc8db2abfb, type: 3}
-  audioPuzzleIntro: {fileID: 8300000, guid: 2027d2df4fd72314f9335a7830442ee2, type: 3}
-  audioPuzzleDurante: {fileID: 8300000, guid: 2ca8d1b95cf197d45a223b19c31af2e7, type: 3}
+  audioModuloActivo: {fileID: 0}
+  audioIncorrecto: {fileID: 0}
+  audioModuloRestaurado: {fileID: 0}
+  audioBotonesError: {fileID: 0}
+  audioBotonesExito: {fileID: 0}
+  audioCablesError: {fileID: 0}
+  audioCablesExito: {fileID: 0}
   audioPuzzleError: {fileID: 0}
-  audioPuzzleExito: {fileID: 8300000, guid: ac066e0e1fec165439ad4155c5898820, type: 3}
-  audioTiempoCritico: {fileID: 8300000, guid: db71bdbbeed726a4ca1c54f24ee30076, type: 3}
-  audioNucleoSobrecarga: {fileID: 8300000, guid: bac820471c841d2488a4681b5ab619de, type: 3}
+  audioPuzzleExito: {fileID: 0}
+  audioGearSistema: {fileID: 0}
+  audioGearOrden: {fileID: 0}
+  audioGearSinSecuencia: {fileID: 0}
+  audioGearIntento: {fileID: 0}
+  audioGearError: {fileID: 0}
+  audioGearExito: {fileID: 0}
   audioFinalNivel: {fileID: 0}
+  pausaEntreDialogos: 0.35
+  duracionSinAudio: 1.4
 --- !u!114 &531027066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10821,6 +10823,18 @@ MonoBehaviour:
   interactionPoint: {fileID: 1820050930}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 1
+--- !u!114 &726666412 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6280275422249880896, guid: 83e5a2e72a6831242a38dbb4d09e845e, type: 3}
+  m_PrefabInstance: {fileID: 726666407}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726666409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c978c15d6ac71f47a82585188d2e64c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MachineInteraction
 --- !u!1001 &735423007
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17323,7 +17337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeManager
   timer: 0
-  limitTime: 75
+  limitTime: 90
   gameOverPanel: {fileID: 868392865}
   gamePanel: {fileID: 1927596707}
   timerText: {fileID: 2013069887}
@@ -17359,13 +17373,17 @@ MonoBehaviour:
   playIntroOnStart: 1
   pausaEntreDialogos: 0.6
   extraSinAudio: 2.5
-  audioInicializando: {fileID: 8300000, guid: 0e8ab13d7b76b5b47b277bf6620563a6, type: 3}
-  audioOperador: {fileID: 8300000, guid: 032abda3fa6106146a3d83800bd2dac1, type: 3}
-  audioFallaTotal: {fileID: 8300000, guid: fe95db713a9a072408617537935a5322, type: 3}
-  audioSistemasColapsados: {fileID: 8300000, guid: 8647075b0e07cba45b4870b3a2a2aeaf, type: 3}
-  audioRestaurarModulos: {fileID: 8300000, guid: 578746a2f725bf249be16a1073a8c2fc, type: 3}
-  audioSinMargen: {fileID: 8300000, guid: 80e0b25498d362b4ab88b14f526da984, type: 3}
-  audioBuenaSuerte: {fileID: 8300000, guid: df52f99bfe9481649bfc2c6d1228cd4b, type: 3}
+  audioConexionProduccion: {fileID: 8300000, guid: 4a9d0636c56291e4ebe2e56d665eafab, type: 3}
+  audioPrimerSector: {fileID: 8300000, guid: 4ffab9f089ff6bf45928d84be9984aeb, type: 3}
+  audioFallaExtendida: {fileID: 8300000, guid: 0ac328d0e4ffc3b4f9be8020b32bc5d1, type: 3}
+  audioAreaProduccion: {fileID: 8300000, guid: 333e691d1c97d3e4b9620a5e49d9ea5e, type: 3}
+  audioMasModulos: {fileID: 8300000, guid: 0370c498653ff5046b5b47d8751f0c40, type: 3}
+  audioSistemasConocidos: {fileID: 8300000, guid: e9da9fde70c7c02469a7c949df66f29b, type: 3}
+  audioNoRepetire: {fileID: 8300000, guid: 3c3f7c6c57ae0874f8a79e9111c81610, type: 3}
+  audioNuevaFalla: {fileID: 8300000, guid: 7829919a4a32c544ea8cfb327a7f9035, type: 3}
+  audioEngranajes: {fileID: 8300000, guid: aca926825fe4d4f4f9de8afa6cd120b6, type: 3}
+  audioReparaModulos: {fileID: 8300000, guid: 8e42413bba0e41f4fb0b511d968b6611, type: 3}
+  audioAvanzaCuidado: {fileID: 8300000, guid: f61b4709d7318e342878a0dba3034c9c, type: 3}
 --- !u!114 &1105071179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17378,23 +17396,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087b02f6edf9b27ae883afb820f3a3f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelTwoDialogueController
-  audioTutorial: {fileID: 8300000, guid: 4fb87bf525ff62148bf36da4df8b087a, type: 3}
-  audioAlerta: {fileID: 8300000, guid: af19a2b2f4133da49af94ac0e8dba4d9, type: 3}
-  audioBotonesIntro: {fileID: 8300000, guid: 3b0f58e231d769a47bdd83b1a73d773c, type: 3}
-  audioBotonesDurante: {fileID: 8300000, guid: 781dc11227a4f94438fb144fd3dc5ac3, type: 3}
-  audioBotonesError: {fileID: 8300000, guid: e63a2e6a3f7c2184cbf4e362c5dd11b4, type: 3}
-  audioBotonesExito: {fileID: 8300000, guid: 96082f9ce0f00024796908186ed79e8a, type: 3}
-  audioCablesIntro: {fileID: 8300000, guid: f068b2a30d52fae40be728ec2a3cf882, type: 3}
-  audioCablesDurante: {fileID: 8300000, guid: 8c2bc68b196f9df4396f34b785d8a9b1, type: 3}
-  audioCablesError: {fileID: 8300000, guid: 18c31c6a277e9884fa3664b1802a134f, type: 3}
-  audioCablesExito: {fileID: 8300000, guid: 197c46f1d1bfdbc409f37bcc8db2abfb, type: 3}
-  audioPuzzleIntro: {fileID: 8300000, guid: 2027d2df4fd72314f9335a7830442ee2, type: 3}
-  audioPuzzleDurante: {fileID: 8300000, guid: 2ca8d1b95cf197d45a223b19c31af2e7, type: 3}
-  audioPuzzleError: {fileID: 0}
-  audioPuzzleExito: {fileID: 8300000, guid: ac066e0e1fec165439ad4155c5898820, type: 3}
-  audioTiempoCritico: {fileID: 8300000, guid: db71bdbbeed726a4ca1c54f24ee30076, type: 3}
-  audioNucleoSobrecarga: {fileID: 8300000, guid: bac820471c841d2488a4681b5ab619de, type: 3}
-  audioFinalNivel: {fileID: 0}
+  audioModuloActivo: {fileID: 8300000, guid: 3a5355a3b2722c64da08ff1aa1e64c26, type: 3}
+  audioIncorrecto: {fileID: 8300000, guid: 2555e1eb479465a41ab955895fe3d941, type: 3}
+  audioModuloRestaurado: {fileID: 8300000, guid: aec3dbb3db1f3704196ff1505a9a4c90, type: 3}
+  audioBotonesError: {fileID: 8300000, guid: 45856ef18c5c1f84a9384f628e16af35, type: 3}
+  audioBotonesExito: {fileID: 8300000, guid: 348cc67b6a158b249a2f81a9203b1b20, type: 3}
+  audioCablesError: {fileID: 8300000, guid: 3baf8c8b96ddd764e968b700534c4700, type: 3}
+  audioCablesExito: {fileID: 8300000, guid: a523b899d2f6ba341a6225ff018f7c23, type: 3}
+  audioPuzzleError: {fileID: 8300000, guid: 39e8a6fc9d9792741b3bb0bb80d3c9bd, type: 3}
+  audioPuzzleExito: {fileID: 8300000, guid: 3eed0a35ad7f8174f8f6d4a4f7130853, type: 3}
+  audioGearSistema: {fileID: 8300000, guid: f01f2d01835029e408ebc13bff23ecd0, type: 3}
+  audioGearOrden: {fileID: 8300000, guid: be049735f767b21478d954d7bef12e0f, type: 3}
+  audioGearSinSecuencia: {fileID: 8300000, guid: f770184771e3315478f0ce9b33903831, type: 3}
+  audioGearIntento: {fileID: 8300000, guid: f33075360926f944eb9093027077b2a2, type: 3}
+  audioGearError: {fileID: 8300000, guid: 2b67dc2de3bb28c42affa708640d2edf, type: 3}
+  audioGearExito: {fileID: 8300000, guid: 5e8be7dfcbdb8bb40acb4e63c998bd8b, type: 3}
+  audioFinalNivel: {fileID: 8300000, guid: 900e03f9b8551314f8d829ef95d9dc23, type: 3}
+  pausaEntreDialogos: 0.35
+  duracionSinAudio: 1.4
 --- !u!1001 &1105462558
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18999,6 +19018,7 @@ MonoBehaviour:
   interactionPoint: {fileID: 1617647891}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 1
 --- !u!1 &1205593783
 GameObject:
   m_ObjectHideFlags: 0
@@ -19658,13 +19678,17 @@ MonoBehaviour:
   playIntroOnStart: 1
   pausaEntreDialogos: 0.6
   extraSinAudio: 2.5
-  audioInicializando: {fileID: 8300000, guid: 0e8ab13d7b76b5b47b277bf6620563a6, type: 3}
-  audioOperador: {fileID: 8300000, guid: 032abda3fa6106146a3d83800bd2dac1, type: 3}
-  audioFallaTotal: {fileID: 8300000, guid: fe95db713a9a072408617537935a5322, type: 3}
-  audioSistemasColapsados: {fileID: 8300000, guid: 8647075b0e07cba45b4870b3a2a2aeaf, type: 3}
-  audioRestaurarModulos: {fileID: 8300000, guid: 578746a2f725bf249be16a1073a8c2fc, type: 3}
-  audioSinMargen: {fileID: 8300000, guid: 80e0b25498d362b4ab88b14f526da984, type: 3}
-  audioBuenaSuerte: {fileID: 8300000, guid: df52f99bfe9481649bfc2c6d1228cd4b, type: 3}
+  audioConexionProduccion: {fileID: 0}
+  audioPrimerSector: {fileID: 0}
+  audioFallaExtendida: {fileID: 0}
+  audioAreaProduccion: {fileID: 0}
+  audioMasModulos: {fileID: 0}
+  audioSistemasConocidos: {fileID: 0}
+  audioNoRepetire: {fileID: 0}
+  audioNuevaFalla: {fileID: 0}
+  audioEngranajes: {fileID: 0}
+  audioReparaModulos: {fileID: 0}
+  audioAvanzaCuidado: {fileID: 0}
 --- !u!1001 &1277826215
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23158,11 +23182,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5b2ff8242284644a7f88b3b6bbf37a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MachineDialogueTrigger
-  type: 3
+  type: 2
   player: {fileID: 109638190}
   interactionPoint: {fileID: 710889382}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 1
 --- !u!1001 &1491134962
 PrefabInstance:
   m_ObjectHideFlags: 0

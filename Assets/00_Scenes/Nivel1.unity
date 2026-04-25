@@ -1397,7 +1397,7 @@ MonoBehaviour:
   targetPrefab: {fileID: 2386517128196464931, guid: 14474902cb29f7166ac04530cd167bbc, type: 3}
   panelCamera: {fileID: 639360282}
   machineOwner: {fileID: 581801759}
-  cableCount: 10
+  cableCount: 5
   topLeft: {fileID: 1572777937}
   bottomRight: {fileID: 626265477}
   minDistance: 0.1
@@ -7751,6 +7751,7 @@ MonoBehaviour:
   interactionPoint: {fileID: 1006388991}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 0
 --- !u!4 &585035146 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2114326916341968809, guid: 38c4b3b9039cd96a382dbea3dac9dc04, type: 3}
@@ -10622,11 +10623,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e5b2ff8242284644a7f88b3b6bbf37a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MachineDialogueTrigger
-  type: 3
+  type: 2
   player: {fileID: 1041237334}
   interactionPoint: {fileID: 760771887}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 0
 --- !u!1 &760771886
 GameObject:
   m_ObjectHideFlags: 0
@@ -21095,6 +21097,7 @@ MonoBehaviour:
   interactionPoint: {fileID: 89656474}
   distance: 1
   mostrarSoloUnaVez: 1
+  mostrarLogs: 0
 --- !u!4 &1430724872 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8956639752897311457, guid: 81dcdc11e12998aa48d39cca7f16b505, type: 3}
@@ -26380,6 +26383,7 @@ MonoBehaviour:
   interactionPoint: {fileID: 89656474}
   distance: 3
   mostrarSoloUnaVez: 1
+  mostrarLogs: 0
 --- !u!1001 &1800204045
 PrefabInstance:
   m_ObjectHideFlags: 0

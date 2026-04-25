@@ -2,40 +2,71 @@
 
 public class LevelTwoDialogueController : MonoBehaviour
 {
-    [Header("Audios de máquinas")]
-    public AudioClip audioTutorial;
-    public AudioClip audioAlerta;
+    [Header("GENERALES")]
+    public AudioClip audioModuloActivo;
+    public AudioClip audioIncorrecto;
+    public AudioClip audioModuloRestaurado;
 
-    public AudioClip audioBotonesIntro;
-    public AudioClip audioBotonesDurante;
+    [Header("BOTONES")]
     public AudioClip audioBotonesError;
     public AudioClip audioBotonesExito;
 
-    public AudioClip audioCablesIntro;
-    public AudioClip audioCablesDurante;
+    [Header("CABLES")]
     public AudioClip audioCablesError;
     public AudioClip audioCablesExito;
 
-
-    public AudioClip audioPuzzleIntro;
-    public AudioClip audioPuzzleDurante;
+    [Header("PUZZLE")]
     public AudioClip audioPuzzleError;
     public AudioClip audioPuzzleExito;
 
-    public AudioClip audioTiempoCritico;
-    public AudioClip audioNucleoSobrecarga;
+    [Header("ENGRANAJES INTRO POR PARTES")]
+    public AudioClip audioGearSistema;
+    public AudioClip audioGearOrden;
+    public AudioClip audioGearSinSecuencia;
+    public AudioClip audioGearIntento;
+
+    [Header("ENGRANAJES RESULTADO")]
+    public AudioClip audioGearError;
+    public AudioClip audioGearExito;
+
+    [Header("FINAL")]
     public AudioClip audioFinalNivel;
 
+    [Header("Tiempos")]
+    public float pausaEntreDialogos = 0.3f;
+    public float duracionSinAudio = 1.2f;
+
     private DialogueManager dm;
+    private int gearPasoActual = 0;
+
+    private string[] gearTextos;
+    private AudioClip[] gearAudios;
 
     void Awake()
     {
         dm = DialogueManager.Instance;
+
         if (dm == null)
             dm = FindAnyObjectByType<DialogueManager>();
+
+        gearTextos = new string[]
+        {
+            "Sistema de engranajes desincronizado.",
+            "Presiona los engranajes en el orden correcto.",
+            "El sistema no puede mostrar la secuencia.",
+            "Tendrás que adivinar el orden."
+        };
+
+        gearAudios = new AudioClip[]
+        {
+            audioGearSistema,
+            audioGearOrden,
+            audioGearSinSecuencia,
+            audioGearIntento
+        };
     }
 
-    void Show(string texto, AudioClip audio)
+    void Show(string texto, AudioClip audio = null)
     {
         if (dm == null)
             dm = FindAnyObjectByType<DialogueManager>();
@@ -44,99 +75,88 @@ public class LevelTwoDialogueController : MonoBehaviour
             dm.ShowMessage(texto, audio);
     }
 
-    public void Tutorial()
+    public void ModuloActivo()
     {
-        Show("Utiliza el entorno para localizar las fallas.\nAcércate a una máquina dañada.\nCuando estés cerca, presiona la tecla E para interactuar.\nTrabaja rápido. El tiempo es limitado.", audioTutorial);
+        Show("Módulo activo.", audioModuloActivo);
     }
 
-    public void Alerta()
+    public void Incorrecto()
     {
-        Show("Señal de falla detectada.", audioAlerta);
+        Show("Incorrecto.", audioIncorrecto);
     }
 
-    public void BotonesIntro()
+    public void ModuloRestaurado()
     {
-        Show("Panel de memoria dañado.Debes observar la secuencia de luces y repetirla exactamente.", audioBotonesIntro);
-    }
-
-    public void BotonesDurante()
-    {
-        Show("Memoriza el patrón...", audioBotonesDurante);
+        Show("Módulo restaurado.", audioModuloRestaurado);
     }
 
     public void BotonesError()
     {
-        Show("Error en la secuencia.Reiniciando patrón.", audioBotonesError);
+        Show("Secuencia incorrecta.", audioBotonesError);
     }
 
     public void BotonesExito()
     {
-        Show("Secuencia correcta.Módulo de memoria restaurado.", audioBotonesExito);
-    }
-
-    public void CablesIntro()
-    {
-        Show("Sistema de energía inestable.Debes reconectar los cables correctamente.Cada color debe coincidir.", audioCablesIntro);
-    }
-
-    public void CablesDurante()
-    {
-        Show("Restableciendo flujo energético...", audioCablesDurante);
+        Show("Memoria estabilizada.", audioBotonesExito);
     }
 
     public void CablesError()
     {
-        Show("Conexión incorrecta.El flujo sigue inestable.", audioCablesError);
+        Show("Conexión incorrecta.", audioCablesError);
     }
 
     public void CablesExito()
     {
-        Show("Conexiones estabilizadas.Energía restaurada.", audioCablesExito);
-    }
-
-
-
-    public void PuzzleIntro()
-    {
-        Show("Módulo de identificación visual dañado.La imagen del operador principal fue fragmentada. Reconstruye el retrato moviendo las piezas hasta completar la imagen.", audioPuzzleIntro);
-    }
-
-    public void PuzzleDurante()
-    {
-        Show("Desliza las fichas hacia el espacio vacío.Restaura la imagen original para validar el sistema.", audioPuzzleDurante);
+        Show("Energía restaurada.", audioCablesExito);
     }
 
     public void PuzzleError()
     {
-        Show("Movimiento inválido. Solo puedes mover fichas junto al espacio vacío.", audioPuzzleError);
+        Show("Movimiento inválido.", audioPuzzleError);
     }
 
     public void PuzzleExito()
     {
-        Show("Imagen reconstruida. Identificación visual restaurada.", audioPuzzleExito);
+        Show("Identificación restaurada.", audioPuzzleExito);
     }
-    /*public void GearIntro()
+
+    public void GearIntro()
     {
-        Show("Módulo de identificación visual dañado.La imagen del operador principal fue fragmentada. Reconstruye el retrato moviendo las piezas hasta completar la imagen.", audioPuzzleIntro);
+        gearPasoActual = 0;
+        CancelInvoke(nameof(MostrarSiguienteGear));
+        MostrarSiguienteGear();
+    }
+
+    void MostrarSiguienteGear()
+    {
+        if (gearPasoActual >= gearTextos.Length)
+            return;
+
+        AudioClip audio = gearAudios[gearPasoActual];
+
+        Show(gearTextos[gearPasoActual], audio);
+
+        float duracion = audio != null ? audio.length + pausaEntreDialogos : duracionSinAudio;
+
+        gearPasoActual++;
+        Invoke(nameof(MostrarSiguienteGear), duracion);
+    }
+
+    public void GearError()
+    {
+        CancelInvoke(nameof(MostrarSiguienteGear));
+        Show("Orden incorrecto.", audioGearError);
     }
 
     public void GearExito()
     {
-        Show("Imagen reconstruida. Identificación visual restaurada.", audioPuzzleExito);
-    }*/
-
-    public void TiempoCritico()
-    {
-        Show("Tiempo crítico. Aumenta la velocidad de reparación.", audioTiempoCritico);
-    }
-
-    public void NucleoSobrecarga()
-    {
-        Show("Advertencia. El núcleo se está sobrecargando.", audioNucleoSobrecarga);
+        CancelInvoke(nameof(MostrarSiguienteGear));
+        Show("Engranajes sincronizados.", audioGearExito);
     }
 
     public void FinalNivel()
     {
-        Show("Todos los módulos han sido restaurados.El sistema vuelve a estar estable. Excelente trabajo, operador.Preparando siguiente zona...", audioFinalNivel);
+        CancelInvoke(nameof(MostrarSiguienteGear));
+        Show("Zona estabilizada.\nBuen trabajo, operador.", audioFinalNivel);
     }
 }
