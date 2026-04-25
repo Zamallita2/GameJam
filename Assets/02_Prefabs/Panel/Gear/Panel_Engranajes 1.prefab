@@ -250,7 +250,11 @@ MonoBehaviour:
   lampNormal: {fileID: 2100000, guid: ed237106997f77a4c84b54d33c61de08, type: 2}
   lampOk: {fileID: 2100000, guid: 7c26a5f65ec8b0847b7d6837dafd0316, type: 2}
   lampError: {fileID: 2100000, guid: fca5e988a1faa544ca9f7a660360b509, type: 2}
+  main: {fileID: 0}
   canvasPanel: {fileID: 620577568545493527}
+  machineOwner: {fileID: 0}
+  ajustarX: -0.7
+  ajustarY: -0.4
 --- !u!1 &5122888119043003091
 GameObject:
   m_ObjectHideFlags: 0
