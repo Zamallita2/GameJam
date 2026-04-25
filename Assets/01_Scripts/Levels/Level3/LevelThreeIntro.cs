@@ -11,13 +11,13 @@ public class LevelThreeIntro : MonoBehaviour
     public float extraSinAudio = 2.5f;
 
     [Header("Audios de introducción")]
-    public AudioClip audioInicializando;
-    public AudioClip audioOperador;
-    public AudioClip audioFallaTotal;
-    public AudioClip audioSistemasColapsados;
-    public AudioClip audioRestaurarModulos;
-    public AudioClip audioSinMargen;
-    public AudioClip audioBuenaSuerte;
+    public AudioClip audioEstabilidadTemporal;
+    public AudioClip audioSincronizacion;
+    public AudioClip audioCargaNucleo;
+    public AudioClip audioFallasRapidas;
+    public AudioClip audioSinAyuda;
+    public AudioClip audioActuaSolo;
+    public AudioClip audioSinRecuperacion;
 
     private DialogueManager dm;
     private int pasoActual = 0;
@@ -35,38 +35,34 @@ public class LevelThreeIntro : MonoBehaviour
 
         textos = new string[]
         {
-            "Inicializando sistema...",
-            "Operador...si puedes escuchar esto...\nsignifica que eres nuestra última conexión activa.",
-            "La instalación ha sufrido una falla total.",
-            "Los sistemas internos han colapsado...\ny el núcleo está entrando en estado crítico.",
-            "Necesitamos que restaures los módulos manualmente.",
-            "No hay margen de error.",
-            "Buena suerte, operador."
+            "Operador...\nLa estabilidad del sistema es temporal.",
+            "Los módulos restaurados no mantienen sincronización completa.",
+            "La carga del núcleo ha aumentado.",
+            "Las fallas están reapareciendo...\nmás rápido que antes.",
+            "No puedo asistirte más.\nYa conoces los sistemas.",
+            "Debes actuar por tu cuenta.",
+            "Si fallas ahora...\nno habrá recuperación."
         };
 
         audios = new AudioClip[]
         {
-            audioInicializando,
-            audioOperador,
-            audioFallaTotal,
-            audioSistemasColapsados,
-            audioRestaurarModulos,
-            audioSinMargen,
-            audioBuenaSuerte
+            audioEstabilidadTemporal,
+            audioSincronizacion,
+            audioCargaNucleo,
+            audioFallasRapidas,
+            audioSinAyuda,
+            audioActuaSolo,
+            audioSinRecuperacion
         };
 
         if (playIntroOnStart)
             IniciarIntro();
-            Debug.Log("Inicioa");
-        Debug.Log("Awake");
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             TerminarIntro();
-        }
     }
 
     public void IniciarIntro()
@@ -118,7 +114,9 @@ public class LevelThreeIntro : MonoBehaviour
 
         if (playerMovement != null)
             playerMovement.SetCanMove(true);
+
         TimeManager time = FindFirstObjectByType<TimeManager>();
-        time.Iniciar();
+        if (time != null)
+            time.Iniciar();
     }
 }

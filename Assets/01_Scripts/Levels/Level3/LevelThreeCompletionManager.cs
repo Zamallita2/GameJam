@@ -5,23 +5,35 @@ public class LevelThreeCompletionManager : MonoBehaviour
 {
     public static LevelThreeCompletionManager Instance;
 
-    [Header("Cantidad de m�quinas a reparar")]
+    [Header("Cantidad de máquinas a reparar")]
     public int totalMachines = 4;
 
     [Header("Luces")]
-    public float lightDisableRadius = 1f;
+    public float lightDisableRadius = 5f;
 
     [Header("Siguiente escena")]
-    public string nextSceneName = "Nivel2";
-    public float delayBeforeNextScene = 6f;
+    public string nextSceneName = "Nivel4";
+    public float delayBeforeNextScene = 1f;
 
-    [Header("Audio final opcional")]
-    public AudioClip finalVoice;
+    [Header("Tiempos de diálogo")]
+    public float pausaEntreDialogos = 0.6f;
+    public float extraSinAudio = 2.5f;
+
+    [Header("Audios finales")]
+    public AudioClip audioModulosEstabilizados;
+    public AudioClip audioNucleoInestable;
+    public AudioClip audioSinTiempo;
+    public AudioClip audioZonaFinal;
 
     private int repairedMachines = 0;
     private bool levelFinished = false;
 
     private LightFlicker[] allLights;
+    private DialogueManager dm;
+
+    private int pasoActual = 0;
+    private string[] textos;
+    private AudioClip[] audios;
 
     void Awake()
     {
@@ -30,10 +42,27 @@ public class LevelThreeCompletionManager : MonoBehaviour
 
     void Start()
     {
-        // encuentra TODAS las luces autom�ticamente
-        allLights = FindObjectsByType<LightFlicker>(
-            FindObjectsSortMode.None
-        );
+        allLights = FindObjectsByType<LightFlicker>(FindObjectsSortMode.None);
+
+        dm = DialogueManager.Instance;
+        if (dm == null)
+            dm = FindAnyObjectByType<DialogueManager>();
+
+        textos = new string[]
+        {
+            "Módulos estabilizados...\ntemporalmente.",
+            "El núcleo sigue siendo inestable.",
+            "Operador...\nte estás quedando sin tiempo.",
+            "Preparando acceso a la zona final..."
+        };
+
+        audios = new AudioClip[]
+        {
+            audioModulosEstabilizados,
+            audioNucleoInestable,
+            audioSinTiempo,
+            audioZonaFinal
+        };
     }
 
     public void RegisterMachineRepaired(Transform machine)
@@ -42,17 +71,12 @@ public class LevelThreeCompletionManager : MonoBehaviour
 
         repairedMachines++;
 
-        Debug.Log(
-            $"[LevelTwoCompletion] M�quinas reparadas: " +
-            $"{repairedMachines}/{totalMachines}"
-        );
+        Debug.Log("[LevelThreeCompletion] Máquinas reparadas: " + repairedMachines + "/" + totalMachines);
 
         DisableNearbyLights(machine);
 
         if (repairedMachines >= totalMachines)
-        {
             FinishLevel();
-        }
     }
 
     void DisableNearbyLights(Transform machine)
@@ -62,16 +86,10 @@ public class LevelThreeCompletionManager : MonoBehaviour
             if (light == null || light.isTurnedOff)
                 continue;
 
-            float distance =
-                Vector3.Distance(
-                    machine.position,
-                    light.transform.position
-                );
+            float distance = Vector3.Distance(machine.position, light.transform.position);
 
             if (distance <= lightDisableRadius)
-            {
                 light.TurnOff();
-            }
         }
     }
 
@@ -79,21 +97,31 @@ public class LevelThreeCompletionManager : MonoBehaviour
     {
         levelFinished = true;
 
-        DialogueManager dm =
-            FindAnyObjectByType<DialogueManager>();
+        TimeManager time = FindAnyObjectByType<TimeManager>();
+        if (time != null)
+            time.timerPausado = true;
 
-        if (dm != null)
+        pasoActual = 0;
+        MostrarPasoFinal();
+    }
+
+    void MostrarPasoFinal()
+    {
+        if (pasoActual >= textos.Length)
         {
-            dm.ShowMessage(
-                "Todos los m�dulos han sido restaurados. " +
-                "El sistema vuelve a estar estable. " +
-                "Excelente trabajo, operador. " +
-                "Preparando siguiente zona...",
-                finalVoice
-            );
+            Invoke(nameof(LoadNextScene), delayBeforeNextScene);
+            return;
         }
 
-        Invoke(nameof(LoadNextScene), delayBeforeNextScene);
+        AudioClip audioActual = audios[pasoActual];
+
+        if (dm != null)
+            dm.ShowMessage(textos[pasoActual], audioActual);
+
+        float duracion = audioActual != null ? audioActual.length + pausaEntreDialogos : extraSinAudio;
+
+        pasoActual++;
+        Invoke(nameof(MostrarPasoFinal), duracion);
     }
 
     void LoadNextScene()

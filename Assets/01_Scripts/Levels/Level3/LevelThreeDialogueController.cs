@@ -2,40 +2,43 @@
 
 public class LevelThreeDialogueController : MonoBehaviour
 {
-    [Header("Audios de máquinas")]
+    [Header("Audios generales")]
     public AudioClip audioTutorial;
     public AudioClip audioAlerta;
+    public AudioClip audioTiempoCritico;
+    public AudioClip audioNucleoSobrecarga;
 
+    [Header("BOTONES")]
     public AudioClip audioBotonesIntro;
-    public AudioClip audioBotonesDurante;
     public AudioClip audioBotonesError;
     public AudioClip audioBotonesExito;
 
+    [Header("CABLES")]
     public AudioClip audioCablesIntro;
-    public AudioClip audioCablesDurante;
     public AudioClip audioCablesError;
     public AudioClip audioCablesExito;
 
-
+    [Header("PUZZLE")]
     public AudioClip audioPuzzleIntro;
-    public AudioClip audioPuzzleDurante;
     public AudioClip audioPuzzleError;
     public AudioClip audioPuzzleExito;
 
-    public AudioClip audioTiempoCritico;
-    public AudioClip audioNucleoSobrecarga;
-    public AudioClip audioFinalNivel;
+    [Header("GEAR / ENGRANAJES")]
+    public AudioClip audioGearIntro;
+    public AudioClip audioGearError;
+    public AudioClip audioGearExito;
 
     private DialogueManager dm;
 
     void Awake()
     {
         dm = DialogueManager.Instance;
+
         if (dm == null)
             dm = FindAnyObjectByType<DialogueManager>();
     }
 
-    void Show(string texto, AudioClip audio)
+    void Show(string texto, AudioClip audio = null)
     {
         if (dm == null)
             dm = FindAnyObjectByType<DialogueManager>();
@@ -46,97 +49,81 @@ public class LevelThreeDialogueController : MonoBehaviour
 
     public void Tutorial()
     {
-        Show("Utiliza el entorno para localizar las fallas.\nAcércate a una máquina dañada.\nCuando estés cerca, presiona la tecla E para interactuar.\nTrabaja rápido. El tiempo es limitado.", audioTutorial);
+        Show("Trabaja rápido.\nEl sistema no esperará.", audioTutorial);
     }
 
     public void Alerta()
     {
-        Show("Señal de falla detectada.", audioAlerta);
+        Show("Inestabilidad detectada.", audioAlerta);
     }
-
-    public void BotonesIntro()
-    {
-        Show("Panel de memoria dañado.Debes observar la secuencia de luces y repetirla exactamente.", audioBotonesIntro);
-    }
-
-    public void BotonesDurante()
-    {
-        Show("Memoriza el patrón...", audioBotonesDurante);
-    }
-
-    public void BotonesError()
-    {
-        Show("Error en la secuencia.Reiniciando patrón.", audioBotonesError);
-    }
-
-    public void BotonesExito()
-    {
-        Show("Secuencia correcta.Módulo de memoria restaurado.", audioBotonesExito);
-    }
-
-    public void CablesIntro()
-    {
-        Show("Sistema de energía inestable.Debes reconectar los cables correctamente.Cada color debe coincidir.", audioCablesIntro);
-    }
-
-    public void CablesDurante()
-    {
-        Show("Restableciendo flujo energético...", audioCablesDurante);
-    }
-
-    public void CablesError()
-    {
-        Show("Conexión incorrecta.El flujo sigue inestable.", audioCablesError);
-    }
-
-    public void CablesExito()
-    {
-        Show("Conexiones estabilizadas.Energía restaurada.", audioCablesExito);
-    }
-
-
-
-    public void PuzzleIntro()
-    {
-        Show("Módulo de identificación visual dañado.La imagen del operador principal fue fragmentada. Reconstruye el retrato moviendo las piezas hasta completar la imagen.", audioPuzzleIntro);
-    }
-
-    public void PuzzleDurante()
-    {
-        Show("Desliza las fichas hacia el espacio vacío.Restaura la imagen original para validar el sistema.", audioPuzzleDurante);
-    }
-
-    public void PuzzleError()
-    {
-        Show("Movimiento inválido. Solo puedes mover fichas junto al espacio vacío.", audioPuzzleError);
-    }
-
-    public void PuzzleExito()
-    {
-        Show("Imagen reconstruida. Identificación visual restaurada.", audioPuzzleExito);
-    }
-    /*public void GearIntro()
-    {
-        Show("Módulo de identificación visual dañado.La imagen del operador principal fue fragmentada. Reconstruye el retrato moviendo las piezas hasta completar la imagen.", audioPuzzleIntro);
-    }
-
-    public void GearExito()
-    {
-        Show("Imagen reconstruida. Identificación visual restaurada.", audioPuzzleExito);
-    }*/
 
     public void TiempoCritico()
     {
-        Show("Tiempo crítico. Aumenta la velocidad de reparación.", audioTiempoCritico);
+        Show("Tiempo crítico.", audioTiempoCritico);
     }
 
     public void NucleoSobrecarga()
     {
-        Show("Advertencia. El núcleo se está sobrecargando.", audioNucleoSobrecarga);
+        Show("Carga del núcleo aumentando.", audioNucleoSobrecarga);
     }
 
-    public void FinalNivel()
+    public void BotonesIntro()
     {
-        Show("Todos los módulos han sido restaurados.El sistema vuelve a estar estable. Excelente trabajo, operador.Preparando siguiente zona...", audioFinalNivel);
+        Show("Módulo de memoria activo.", audioBotonesIntro);
+    }
+
+    public void BotonesError()
+    {
+        Show("Secuencia incorrecta.", audioBotonesError);
+    }
+
+    public void BotonesExito()
+    {
+        Show("Memoria estabilizada.", audioBotonesExito);
+    }
+
+    public void CablesIntro()
+    {
+        Show("Módulo de energía activo.", audioCablesIntro);
+    }
+
+    public void CablesError()
+    {
+        Show("Conexión incorrecta.", audioCablesError);
+    }
+
+    public void CablesExito()
+    {
+        Show("Energía restaurada.", audioCablesExito);
+    }
+
+    public void PuzzleIntro()
+    {
+        Show("Módulo visual activo.", audioPuzzleIntro);
+    }
+
+    public void PuzzleError()
+    {
+        Show("Movimiento inválido.", audioPuzzleError);
+    }
+
+    public void PuzzleExito()
+    {
+        Show("Identificación restaurada.", audioPuzzleExito);
+    }
+
+    public void GearIntro()
+    {
+        Show("Engranajes activos.\nLa secuencia será más rápida.", audioGearIntro);
+    }
+
+    public void GearError()
+    {
+        Show("Orden incorrecto.", audioGearError);
+    }
+
+    public void GearExito()
+    {
+        Show("Engranajes estabilizados.", audioGearExito);
     }
 }

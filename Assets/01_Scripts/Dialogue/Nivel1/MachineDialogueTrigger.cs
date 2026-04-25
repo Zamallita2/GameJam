@@ -26,6 +26,7 @@ public class MachineDialogueTrigger : MonoBehaviour
 
     private LevelOneDialogueController levelOneDialogue;
     private LevelTwoDialogueController levelTwoDialogue;
+    private LevelThreeDialogueController levelThreeDialogue;
 
     void Start()
     {
@@ -37,6 +38,7 @@ public class MachineDialogueTrigger : MonoBehaviour
     {
         levelOneDialogue = FindAnyObjectByType<LevelOneDialogueController>();
         levelTwoDialogue = FindAnyObjectByType<LevelTwoDialogueController>();
+        levelThreeDialogue = FindAnyObjectByType<LevelThreeDialogueController>();
     }
 
     void BuscarPlayer()
@@ -71,6 +73,12 @@ public class MachineDialogueTrigger : MonoBehaviour
 
     void EjecutarDialogo()
     {
+        if (levelThreeDialogue != null)
+        {
+            EjecutarNivelTres();
+            return;
+        }
+
         if (levelTwoDialogue != null)
         {
             EjecutarNivelDos();
@@ -122,6 +130,28 @@ public class MachineDialogueTrigger : MonoBehaviour
 
             case MachineDialogueType.Gear:
                 levelTwoDialogue.GearIntro();
+                break;
+        }
+    }
+
+    void EjecutarNivelTres()
+    {
+        switch (type)
+        {
+            case MachineDialogueType.Botones:
+                levelThreeDialogue.BotonesIntro();
+                break;
+
+            case MachineDialogueType.Cables:
+                levelThreeDialogue.CablesIntro();
+                break;
+
+            case MachineDialogueType.Puzzle:
+                levelThreeDialogue.PuzzleIntro();
+                break;
+
+            case MachineDialogueType.Gear:
+                levelThreeDialogue.GearIntro();
                 break;
         }
     }

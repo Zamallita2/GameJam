@@ -9,51 +9,53 @@ public class TimeManager : MonoBehaviour
 
     public GameObject gameOverPanel;
     public GameObject gamePanel;
-    bool isGameOver = false;
 
     public TextMeshProUGUI timerText;
 
-    // Material del texto (instancia para poder modificar glow)
+    public bool started = false;
+    public bool timerPausado = false;
+
+    private bool isGameOver = false;
     private Material textMaterial;
-    public bool started=false;
 
     public void Iniciar()
     {
-        // Crear instancia del material para no modificar el original
-        textMaterial = Instantiate(timerText.fontMaterial);
-        timerText.fontMaterial = textMaterial;
-        started=true;
+        if (timerText != null)
+        {
+            textMaterial = Instantiate(timerText.fontMaterial);
+            timerText.fontMaterial = textMaterial;
+        }
+
+        started = true;
     }
 
     void Update()
     {
-        if(!started)
-            return;
+        if (!started) return;
         if (isGameOver) return;
+        if (timerPausado) return;
 
         timer += Time.deltaTime;
 
         float t = Mathf.Clamp01(timer / limitTime);
 
-        // 🎨 Color dinámico (verde → rojo)
         Color currentColor = Color.Lerp(Color.green, Color.red, t);
-
-        // Convertir color a HEX para usar en Rich Text
         string hexColor = ColorUtility.ToHtmlStringRGB(currentColor);
 
-        // ✨ SOLO el tiempo cambia de color
-        timerText.text = $"<color=#{hexColor}>{timer:F2}</color> / {limitTime:F0}";
+        if (timerText != null)
+            timerText.text = $"<color=#{hexColor}>{timer:F2}</color> / {limitTime:F0}";
 
-        // 💡 Glow dinámico
-        float glowPower = Mathf.Lerp(0.1f, 0.6f, t);
-        textMaterial.SetFloat("_GlowPower", glowPower);
-        textMaterial.SetColor("_GlowColor", currentColor);
-
-        // 🔥 Pulsación cuando está por acabarse
-        if (t > 0.7f)
+        if (textMaterial != null)
         {
-            float pulse = Mathf.Sin(Time.time * 10f) * 0.5f + 0.5f;
-            textMaterial.SetFloat("_GlowPower", Mathf.Lerp(0.3f, 0.8f, pulse));
+            float glowPower = Mathf.Lerp(0.1f, 0.6f, t);
+            textMaterial.SetFloat("_GlowPower", glowPower);
+            textMaterial.SetColor("_GlowColor", currentColor);
+
+            if (t > 0.7f)
+            {
+                float pulse = Mathf.Sin(Time.time * 10f) * 0.5f + 0.5f;
+                textMaterial.SetFloat("_GlowPower", Mathf.Lerp(0.3f, 0.8f, pulse));
+            }
         }
 
         if (timer >= limitTime)
@@ -65,8 +67,13 @@ public class TimeManager : MonoBehaviour
     void GameOver()
     {
         isGameOver = true;
-        gameOverPanel.SetActive(true);
-        gamePanel.SetActive(false);
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        if (gamePanel != null)
+            gamePanel.SetActive(false);
+
         Time.timeScale = 0f;
 
         Cursor.lockState = CursorLockMode.None;
