@@ -7802,7 +7802,7 @@ MonoBehaviour:
   - {fileID: 241246892}
   - {fileID: 1786746204}
   statusLamp: {fileID: 250976593}
-  machineOwner: {fileID: 0}
+  machineOwner: {fileID: 1490295108}
   nivelPrueba: 1
   iniciarAutomaticamente: 1
   secuenciasParaCompletar: 3
@@ -21759,6 +21759,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1424481899}
   m_SourcePrefab: {fileID: 100100000, guid: 83e5a2e72a6831242a38dbb4d09e845e, type: 3}
+--- !u!114 &1490295108 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6280275422249880896, guid: 83e5a2e72a6831242a38dbb4d09e845e, type: 3}
+  m_PrefabInstance: {fileID: 1490295107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1424481897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c978c15d6ac71f47a82585188d2e64c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MachineInteraction
 --- !u!1 &1497274202
 GameObject:
   m_ObjectHideFlags: 0
