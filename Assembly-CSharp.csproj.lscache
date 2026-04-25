@@ -54,55 +54,78 @@ Assets/00_Scenes/CarlaMinijuego/Assets/Assets/Scripts/
  Constants.cs
  Game.cs
  Piece.cs
-Assets/01_Scripts/Machine/
- HandManager.cs
- MachineGlow.cs
- MachineInteraction.cs
- MachineType.cs
- Wire/
-  CableNode.cs
-  CablesPanel.cs
-Assets/01_Scripts/Map/
- Movement.cs
- TimeManager.cs
-Assets/01_Scripts/Menu/
- ButtonAnimator.cs
- GlowPulse.cs
- MenuMusicManager.cs
- MenuSceneManager.cs
-Assets/01_Scripts/MinijuegoCarla/
- juego.cs
- menu.cs
- pieza.cs
-Assets/01_Scripts/PanelFallas/Arrows/
- FastInputButton3D.cs
- FastInputPanelController.cs
- FastInputPrompt3D.cs
- StatusLampa.cs
-Assets/01_Scripts/PanelFallas/
- FitObjectToCamera.cs
- Keys/
-  KeyboardMinigameController.cs
-  KeyButtonController.cs
-  KeyPrompt3D.cs
- PanelBase.cs
- PanelDefinition.cs
- PanelLoader.cs
- SimonButton3D.cs
- SimonButtonsPanel.cs
- StatusLamp.cs
-Assets/01_Scripts/Player/
- ArmsBobbing.cs
- ArmsController.cs
- FirstPersonController.cs
- MouseLook.cs
- PlayerCameraController.cs
- PlayerModeSwitcher.cs
- PlayerMovement.cs
- PlayerVisualSwitcher.cs
-Assets/
- 01_Scripts/Spawner.cs
- TutorialInfo/Scripts/Readme.cs
+Assets/01_Scripts/Dialogue/
+ DialogueManager.cs
+ Nivel1/
+  LevelOneDialogueController.cs
+  MachineDialogueTrigger.cs
+  ObjectivesHUD.cs
+  TutorialTrigger.cs
+ VoiceManager.cs
+Assets/01_Scripts/
+ FolowPlayer.cs
+ GameOverManager.cs
+ Levels/Level2/
+  LevelTwoCompletionManager.cs
+  LevelTwoIntro.cs
+  Nievl2/LevelTwoDialogueController.cs
+ Levels/
+  LevelOneCompletionManager.cs
+  LevelOneIntro.cs
+ Machine/
+  HandManager.cs
+  MachineGlow.cs
+  MachineInteraction.cs
+  MachineType.cs
+  Wire/
+   CableNode.cs
+   CablesPanel.cs
+ Map/
+  LightFlicker.cs
+  Movement.cs
+  TimeManager.cs
+ Menu/
+  ButtonAnimator.cs
+  GlowPulse.cs
+  MenuMusicManager.cs
+  MenuSceneManager.cs
+ MinijuegoCarla/
+  juego.cs
+  menu.cs
+  pieza.cs
+ PanelEngranajes/
+  CanvasColorPanel.cs
+  GearInteractable.cs
+  GearPanel.cs
+ PanelFallas/Arrows/
+  FastInputButton3D.cs
+  FastInputPanelController.cs
+  FastInputPrompt3D.cs
+  StatusLampa.cs
+ PanelFallas/
+  FitObjectToCamera.cs
+  Keys/
+   KeyboardMinigameController.cs
+   KeyButtonController.cs
+   KeyPrompt3D.cs
+  PanelBase.cs
+  PanelDefinition.cs
+  PanelLoader.cs
+  SimonButton3D.cs
+  SimonButtonsPanel.cs
+  StatusLamp.cs
+ Player/
+  ArmsBobbing.cs
+  ArmsController.cs
+  FirstPersonController.cs
+  MouseLook.cs
+  PlayerCameraController.cs
+  PlayerModeSwitcher.cs
+  PlayerMovement.cs
+  PlayerPanelVisibility.cs
+  PlayerVisualSwitcher.cs
+ Spawner.cs
+Assets/TutorialInfo/Scripts/Readme.cs
 Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 
 [metadataReferences]
@@ -163,6 +186,7 @@ Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
  UnityEditor.VideoModule.dll
  UnityEditor.XRModule.dll
  UnityEngine.AccessibilityModule.dll
+ UnityEngine.AdaptivePerformanceModule.dll
  UnityEngine.AIModule.dll
  UnityEngine.AndroidJNIModule.dll
  UnityEngine.AnimationModule.dll
@@ -230,6 +254,7 @@ Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
  UnityEngine.UnityWebRequestModule.dll
  UnityEngine.UnityWebRequestTextureModule.dll
  UnityEngine.UnityWebRequestWWWModule.dll
+ UnityEngine.VectorGraphicsModule.dll
  UnityEngine.VehiclesModule.dll
  UnityEngine.VFXModule.dll
  UnityEngine.VideoModule.dll
@@ -373,7 +398,7 @@ Library/PackageCache/com.unity.collections@aea9d3bd5e19/
 Library/PackageCache/
  com.unity.ext.nunit@ec2d0043d6fc/net40/unity-custom/nunit.framework.dll
  com.unity.nuget.mono-cecil@ecb9724e46ff/Mono.Cecil.dll
- com.unity.visualscripting@191c0d7e3b69/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll
+ com.unity.visualscripting@8bed5ad90189/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll
 Library/ScriptAssemblies/
  PPv2URPConverters.dll
  Unity.2D.Sprite.AIIntegration.Editor.dll
@@ -433,7 +458,7 @@ Library/ScriptAssemblies/
 
 [analyzerReferences]
 ../../../
- .vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.1/Analyzers/Microsoft.Unity.Analyzers.dll
+ .vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.2/Analyzers/Microsoft.Unity.Analyzers.dll
  Unity/Hub/Editor/6000.3.3f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/
   Unity.Properties.SourceGenerator.dll
   Unity.SourceGenerators.dll

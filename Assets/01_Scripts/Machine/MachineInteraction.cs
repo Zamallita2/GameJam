@@ -7,12 +7,13 @@ public class MachineInteraction : MonoBehaviour
     public Camera panelCamera;
     public Camera playerCamera;
     public GameObject player;
+    public GameObject arms;
 
     [Header("Punto real de interacción")]
     public Transform interactionPoint;
 
     [Header("Mano del panel (opcional)")]
-    public Transform panelHand;
+    public GameObject panelHand;
     public Transform panelPointer;
 
     [Header("Configuración")]
@@ -227,23 +228,44 @@ public class MachineInteraction : MonoBehaviour
                 case MachineType.TipoMaquina.Cables:
                     hud.CompleteCables();
                     break;
-
-              
-
                 case MachineType.TipoMaquina.Puzzle:
                     hud.CompletePuzzle();
+                    break;
+                case MachineType.TipoMaquina.Gear:
+                    hud.CompleteGear();
                     break;
             }
         }
 
         // 🔥 CONTADOR DE NIVEL
-        LevelOneCompletionManager manager = LevelOneCompletionManager.Instance;
+        MonoBehaviour manager = null;
 
-        if (manager == null)
-            manager = FindAnyObjectByType<LevelOneCompletionManager>();
+// Intentar con cada manager
+        manager = LevelOneCompletionManager.Instance;
+        if (manager == null) manager = FindAnyObjectByType<LevelOneCompletionManager>();
 
+        if (manager == null) manager = LevelTwoCompletionManager.Instance;
+        if (manager == null) manager = FindAnyObjectByType<LevelTwoCompletionManager>();
+
+        /*if (manager == null) manager = LevelThreeCompletionManager.Instance;
+        if (manager == null) manager = FindAnyObjectByType<LevelThreeCompletionManager>();
+
+        if (manager == null) manager = LevelFourCompletionManager.Instance;
+        if (manager == null) manager = FindAnyObjectByType<LevelFourCompletionManager>();
+
+        if (manager == null) manager = LevelFiveCompletionManager.Instance;
+        if (manager == null) manager = FindAnyObjectByType<LevelFiveCompletionManager>();*/
+
+        // Usar si encontró alguno
         if (manager != null)
-            manager.RegisterMachineRepaired();
+        {
+            // casteo dinámico según tipo
+            if (manager is LevelOneCompletionManager m1) m1.RegisterMachineRepaired(transform);
+            else if (manager is LevelTwoCompletionManager m2) m2.RegisterMachineRepaired(transform);
+            /*else if (manager is LevelThreeCompletionManager m3) m3.RegisterMachineRepaired(transform);
+            else if (manager is LevelFourCompletionManager m4) m4.RegisterMachineRepaired(transform);
+            else if (manager is LevelFiveCompletionManager m5) m5.RegisterMachineRepaired(transform);*/
+        }
 
         Debug.Log($"[MachineInteraction] Máquina reparada: {gameObject.name}");
     }

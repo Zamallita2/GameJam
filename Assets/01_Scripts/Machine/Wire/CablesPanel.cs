@@ -277,6 +277,8 @@ public class CablesPanel : MonoBehaviour
     void StartCable()
     {
         GameObject go = new GameObject("CableLine");
+        go.transform.SetParent(transform); // lo hace hijo de este GameObject
+
         currentLine = go.AddComponent<LineRenderer>();
 
         currentLine.material = new Material(lineMaterial);

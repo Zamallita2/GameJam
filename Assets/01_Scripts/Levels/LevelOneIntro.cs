@@ -58,6 +58,13 @@ public class LevelOneIntro : MonoBehaviour
         if (playIntroOnStart)
             IniciarIntro();
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TerminarIntro();
+        }
+    }
 
     public void IniciarIntro()
     {
@@ -108,5 +115,7 @@ public class LevelOneIntro : MonoBehaviour
 
         if (playerMovement != null)
             playerMovement.SetCanMove(true);
+        TimeManager time = FindFirstObjectByType<TimeManager>();
+        time.Iniciar();
     }
 }

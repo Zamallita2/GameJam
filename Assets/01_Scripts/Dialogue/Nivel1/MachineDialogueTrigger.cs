@@ -7,7 +7,8 @@ public class MachineDialogueTrigger : MonoBehaviour
         Botones,
         Cables,
         Palancas,
-        Puzzle
+        Puzzle,
+        Gear
     }
 
     public MachineDialogueType type;
@@ -17,12 +18,17 @@ public class MachineDialogueTrigger : MonoBehaviour
     public bool mostrarSoloUnaVez = true;
 
     private bool mostrado = false;
-    private LevelOneDialogueController dialogue;
+    private MonoBehaviour dialogue;
 
     void Start()
     {
         dialogue = FindAnyObjectByType<LevelOneDialogueController>();
 
+        if (dialogue == null) dialogue = FindAnyObjectByType<LevelTwoDialogueController>();
+        /*if (dialogue == null) dialogue = FindAnyObjectByType<LevelThreeDialogueController>();
+        if (dialogue == null) dialogue = FindAnyObjectByType<LevelFourDialogueController>();
+        if (dialogue == null) dialogue = FindAnyObjectByType<LevelFiveDialogueController>();*/
+        Debug.Log("Dialogue encontrado: " + dialogue);
         if (player == null)
         {
             GameObject p = GameObject.FindGameObjectWithTag("Player");
@@ -46,16 +52,35 @@ public class MachineDialogueTrigger : MonoBehaviour
             switch (type)
             {
                 case MachineDialogueType.Botones:
-                    dialogue.BotonesIntro();
+                    if (dialogue is LevelOneDialogueController d1) d1.BotonesIntro();
+                    else if (dialogue is LevelTwoDialogueController d2) d2.BotonesIntro();
+                    /*else if (dialogue is LevelThreeDialogueController d3) d3.BotonesIntro();
+                    else if (dialogue is LevelFourDialogueController d4) d4.BotonesIntro();
+                    else if (dialogue is LevelFiveDialogueController d5) d5.BotonesIntro();*/
                     break;
 
                 case MachineDialogueType.Cables:
-                    dialogue.CablesIntro();
+                    if (dialogue is LevelOneDialogueController e1) e1.CablesIntro();
+                    else if (dialogue is LevelTwoDialogueController e2) e2.CablesIntro();
+                    /*else if (dialogue is LevelThreeDialogueController d3) d3.BotonesIntro();
+                    else if (dialogue is LevelFourDialogueController d4) d4.BotonesIntro();
+                    else if (dialogue is LevelFiveDialogueController d5) d5.BotonesIntro();*/
                     break;
 
             
                 case MachineDialogueType.Puzzle:
-                    dialogue.PuzzleIntro();
+                    if (dialogue is LevelOneDialogueController f1) f1.PuzzleIntro();
+                    else if (dialogue is LevelTwoDialogueController f2) f2.PuzzleIntro();
+                    /*else if (dialogue is LevelThreeDialogueController d3) d3.BotonesIntro();
+                    else if (dialogue is LevelFourDialogueController d4) d4.BotonesIntro();
+                    else if (dialogue is LevelFiveDialogueController d5) d5.BotonesIntro();*/
+                    break;
+                case MachineDialogueType.Gear:
+                    /*if (dialogue is LevelOneDialogueController f1) f1.PuzzleIntro();
+                    else if (dialogue is LevelTwoDialogueController f2) f2.PuzzleIntro();
+                    else if (dialogue is LevelThreeDialogueController d3) d3.BotonesIntro();
+                    else if (dialogue is LevelFourDialogueController d4) d4.BotonesIntro();
+                    else if (dialogue is LevelFiveDialogueController d5) d5.BotonesIntro();*/
                     break;
             }
         }
