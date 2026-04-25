@@ -10,6 +10,7 @@ public class ObjectivesHUD : MonoBehaviour
     public TextMeshProUGUI cablesText;
     public TextMeshProUGUI puzzleText;
     public TextMeshProUGUI gearText;
+    public TextMeshProUGUI arrowsText;
 
     [Header("Colores")]
     public Color pendingColor = Color.white;
@@ -22,13 +23,13 @@ public class ObjectivesHUD : MonoBehaviour
         SetPending(botonesText, "Reparar módulo de memoria");
         SetPending(cablesText, "Reconectar cables de energía");
         SetPending(puzzleText, "Reconstruir identificación visual");
-        SetPending(gearText, "Acomodar los engranajes del núcleo");
+        SetPending(gearText, "Acomodar engranajes del núcleo");
+        SetPending(arrowsText, "Restaurar respuesta rápida");
     }
 
     void SetPending(TextMeshProUGUI text, string label)
     {
         if (text == null) return;
-
         text.text = "□ " + label;
         text.color = pendingColor;
     }
@@ -36,7 +37,6 @@ public class ObjectivesHUD : MonoBehaviour
     void SetCompleted(TextMeshProUGUI text, string label)
     {
         if (text == null) return;
-
         text.text = "✓ " + label;
         text.color = completedColor;
     }
@@ -55,8 +55,14 @@ public class ObjectivesHUD : MonoBehaviour
     {
         SetCompleted(puzzleText, "Reconstruir identificación visual");
     }
+
     public void CompleteGear()
     {
-        SetCompleted(gearText, "Acomodar los engranajes del núcleo");
+        SetCompleted(gearText, "Acomodar engranajes del núcleo");
+    }
+
+    public void CompleteArrows()
+    {
+        SetCompleted(arrowsText, "Restaurar respuesta rápida");
     }
 }

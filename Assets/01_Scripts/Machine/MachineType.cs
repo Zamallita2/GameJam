@@ -8,7 +8,8 @@ public class MachineType : MonoBehaviour
         Cables,
         Palancas,
         Puzzle,
-        Gear
+        Gear,
+        Arrows
     }
 
     [Header("Configuración de máquina")]
