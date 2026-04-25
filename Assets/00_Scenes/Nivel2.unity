@@ -9951,8 +9951,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.7442, y: -4}
-  m_SizeDelta: {x: 643.3186, y: 384.27}
+  m_AnchoredPosition: {x: 3.0641, y: 1.7999}
+  m_SizeDelta: {x: 791.7957, y: 548.9865}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &657587834
 MonoBehaviour:
@@ -9974,7 +9974,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 494c39d3e61ea4e4c9e9826fa6706eb9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 373f9a9878a07de41afd2f661939c4cf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -20369,6 +20369,7 @@ MonoBehaviour:
   cablesText: {fileID: 2060606256}
   puzzleText: {fileID: 1024743582}
   gearText: {fileID: 1280969342}
+  arrowsText: {fileID: 0}
   pendingColor: {r: 0.4156863, g: 0.9960785, b: 0.9960785, a: 1}
   completedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1333626047
@@ -27368,8 +27369,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000009775162, y: 0}
-  m_SizeDelta: {x: 779.3374, y: 634.1171}
+  m_AnchoredPosition: {x: -0.000015258789, y: -28}
+  m_SizeDelta: {x: 953.3339, y: 796.5137}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1737470659
 MonoBehaviour:
