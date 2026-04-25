@@ -13,15 +13,28 @@ public class LevelFourCompletionManager : MonoBehaviour
 
     [Header("Siguiente escena")]
     public string nextSceneName = "Nivel5";
-    public float delayBeforeNextScene = 6f;
+    public float delayBeforeNextScene = 1f;
 
-    [Header("Audio final")]
-    public AudioClip finalVoice;
+    [Header("Tiempos de diálogo")]
+    public float pausaEntreDialogos = 0.6f;
+    public float extraSinAudio = 2.5f;
+
+    [Header("Audios finales")]
+    public AudioClip audioAreaEstabilizada;
+    public AudioClip audioNucleoResiste;
+    public AudioClip audioLecturasAnormales;
+    public AudioClip audioAlgoNoEstaBien;
+    public AudioClip audioUltimoNivel;
 
     private int repairedMachines = 0;
     private bool levelFinished = false;
 
     private LightFlicker[] allLights;
+    private DialogueManager dm;
+
+    private int pasoActual = 0;
+    private string[] textos;
+    private AudioClip[] audios;
 
     void Awake()
     {
@@ -31,6 +44,28 @@ public class LevelFourCompletionManager : MonoBehaviour
     void Start()
     {
         allLights = FindObjectsByType<LightFlicker>(FindObjectsSortMode.None);
+
+        dm = DialogueManager.Instance;
+        if (dm == null)
+            dm = FindAnyObjectByType<DialogueManager>();
+
+        textos = new string[]
+        {
+            "Área pesada estabilizada.",
+            "El núcleo aún resiste...\npero sus lecturas no son normales.",
+            "La energía no se está restaurando.\nSolo se está conteniendo.",
+            "Operador...\nalgo dentro del núcleo sigue empeorando.",
+            "Preparando acceso al último nivel..."
+        };
+
+        audios = new AudioClip[]
+        {
+            audioAreaEstabilizada,
+            audioNucleoResiste,
+            audioLecturasAnormales,
+            audioAlgoNoEstaBien,
+            audioUltimoNivel
+        };
     }
 
     public void RegisterMachineRepaired(Transform machine)
@@ -69,17 +104,29 @@ public class LevelFourCompletionManager : MonoBehaviour
         if (time != null)
             time.timerPausado = true;
 
-        DialogueManager dm = FindAnyObjectByType<DialogueManager>();
+        pasoActual = 0;
+        MostrarPasoFinal();
+    }
 
-        if (dm != null)
+    void MostrarPasoFinal()
+    {
+        if (pasoActual >= textos.Length)
         {
-            dm.ShowMessage(
-                "Área pesada estabilizada.\nEl núcleo aún resiste.\nPreparando acceso al último nivel...",
-                finalVoice
-            );
+            Invoke(nameof(LoadNextScene), delayBeforeNextScene);
+            return;
         }
 
-        Invoke(nameof(LoadNextScene), delayBeforeNextScene);
+        AudioClip audioActual = audios[pasoActual];
+
+        if (dm != null)
+            dm.ShowMessage(textos[pasoActual], audioActual);
+
+        float duracion = audioActual != null
+            ? audioActual.length + pausaEntreDialogos
+            : extraSinAudio;
+
+        pasoActual++;
+        Invoke(nameof(MostrarPasoFinal), duracion);
     }
 
     void LoadNextScene()
