@@ -14,8 +14,14 @@ public class KeyPromptVisualEntry
 public class KeyLane
 {
     public KeySymbolType keySymbol;
+
+    [Header("Puntos del carril")]
     public Transform spawnPoint;
     public Transform missPoint;
+
+    [Header("Zona de Hit entre dos puntos")]
+    public Transform hitStart;
+    public Transform hitEnd;
 }
 
 public class KeyboardMinigameController : MonoBehaviour
@@ -32,6 +38,9 @@ public class KeyboardMinigameController : MonoBehaviour
 
     [Header("Materiales de prompts")]
     public List<KeyPromptVisualEntry> promptVisuals = new List<KeyPromptVisualEntry>();
+
+    [Header("Zona de Hit")]
+    public float extraHitMargin = 0.1f;
 
     [Header("UI opcional")]
     public TextMeshProUGUI scoreText;
@@ -62,8 +71,8 @@ public class KeyboardMinigameController : MonoBehaviour
     public float maxMoveSpeed = 4f;
     public int maxPromptsOnScreenLimit = 10;
 
-    [Header("Prompt Scale")]
-    public float promptScale = 0.08f;
+    [Header("Escala Prompt")]
+    public float promptScale = 1.5f;
 
     [Header("Puntaje")]
     public int scorePerHit = 1;
@@ -71,6 +80,15 @@ public class KeyboardMinigameController : MonoBehaviour
 
     [Header("Final")]
     public float closePanelDelay = 1f;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip hitSound;
+    public AudioClip errorSound;
+    public AudioClip missSound;
+    public AudioClip winSound;
+    public AudioClip failSound;
+    [Range(0f, 1f)] public float audioVolume = 1f;
 
     [Header("Debug")]
     public int currentScore = 0;
@@ -90,6 +108,17 @@ public class KeyboardMinigameController : MonoBehaviour
     private bool isFinished = false;
     private Coroutine spawnRoutine;
     private MachineInteraction machineOwner;
+
+    void Awake()
+    {
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        audioSource.playOnAwake = false;
+    }
 
     void OnEnable()
     {
@@ -149,8 +178,6 @@ public class KeyboardMinigameController : MonoBehaviour
         UpdateUI();
 
         spawnRoutine = StartCoroutine(SpawnRoutine());
-
-        Debug.Log($"[KeyboardMinigame] Iniciado dificultad {difficultyLevel}");
     }
 
     void CalculateDifficulty()
@@ -162,10 +189,7 @@ public class KeyboardMinigameController : MonoBehaviour
         maxErrors = baseMaxErrors;
         timeLimit = baseTimeLimit;
 
-        moveSpeed = Mathf.Min(
-            baseMoveSpeed + (extra * speedPerDifficulty),
-            maxMoveSpeed
-        );
+        moveSpeed = Mathf.Min(baseMoveSpeed + (extra * speedPerDifficulty), maxMoveSpeed);
 
         spawnInterval = Mathf.Max(
             baseSpawnInterval - (extra * spawnIntervalDecreasePerDifficulty),
@@ -193,15 +217,9 @@ public class KeyboardMinigameController : MonoBehaviour
 
     void SpawnRandomPrompt()
     {
-        if (promptPrefab == null)
+        if (promptPrefab == null || promptContainer == null)
         {
-            Debug.LogError("[KeyboardMinigame] Falta Prompt Prefab");
-            return;
-        }
-
-        if (promptContainer == null)
-        {
-            Debug.LogError("[KeyboardMinigame] Falta Prompt Container");
+            Debug.LogWarning("Falta Prompt Prefab o Prompt Container.");
             return;
         }
 
@@ -209,9 +227,9 @@ public class KeyboardMinigameController : MonoBehaviour
         KeyLane lane = GetLane(symbol);
         Material material = GetMaterial(symbol);
 
-        if (lane == null || lane.spawnPoint == null || lane.missPoint == null)
+        if (lane == null || lane.spawnPoint == null || lane.missPoint == null || lane.hitStart == null || lane.hitEnd == null)
         {
-            Debug.LogWarning("[KeyboardMinigame] Falta lane/spawn/miss para " + symbol);
+            Debug.LogWarning("Lane mal configurado: " + symbol);
             return;
         }
 
@@ -228,7 +246,7 @@ public class KeyboardMinigameController : MonoBehaviour
 
         if (prompt == null)
         {
-            Debug.LogError("[KeyboardMinigame] El prefab no tiene KeyPrompt3D");
+            Debug.LogError("El promptPrefab no tiene el script KeyPrompt3D.");
             Destroy(obj);
             return;
         }
@@ -250,40 +268,27 @@ public class KeyboardMinigameController : MonoBehaviour
         if (!Input.GetKeyDown(keyCode))
             return;
 
-        if (activePrompts.Count == 0)
+        KeyPrompt3D prompt = GetPromptTouchingZone(symbol);
+
+        if (prompt != null)
         {
-            if (keyLights != null)
-                keyLights.FlashError(symbol);
+            PlaySound(hitSound);
 
-            AddError();
-            return;
-        }
-
-        KeyPrompt3D prompt = activePrompts[0];
-
-        if (prompt == null)
-        {
-            activePrompts.RemoveAt(0);
-            return;
-        }
-
-        if (prompt.keySymbol == symbol)
-        {
             if (keyLights != null)
                 keyLights.Flash(symbol);
 
             prompt.Resolve();
-            activePrompts.RemoveAt(0);
+            activePrompts.Remove(prompt);
 
             currentScore += scorePerHit;
-
-            Debug.Log("[KeyboardMinigame] Correcto " + currentScore + "/" + targetScore);
 
             if (currentScore >= targetScore)
                 StartCoroutine(WinRoutine());
         }
         else
         {
+            PlaySound(errorSound);
+
             if (keyLights != null)
                 keyLights.FlashError(symbol);
 
@@ -291,15 +296,65 @@ public class KeyboardMinigameController : MonoBehaviour
         }
     }
 
-    void AddError()
+    KeyPrompt3D GetPromptTouchingZone(KeySymbolType symbol)
     {
-        currentErrors++;
-        currentScore = Mathf.Max(0, currentScore - penaltyOnMiss);
+        KeyLane lane = GetLane(symbol);
 
-        Debug.Log("[KeyboardMinigame] Error " + currentErrors + "/" + maxErrors);
+        if (lane == null || lane.hitStart == null || lane.hitEnd == null)
+            return null;
 
-        if (currentErrors >= maxErrors)
-            StartCoroutine(FailAndRestartRoutine());
+        Vector3 start = lane.hitStart.position;
+        Vector3 end = lane.hitEnd.position;
+
+        Vector3 direction = end - start;
+        float zoneLength = direction.magnitude;
+
+        if (zoneLength <= 0.001f)
+            return null;
+
+        Vector3 directionNormalized = direction.normalized;
+
+        KeyPrompt3D bestPrompt = null;
+        float bestProgress = -999f;
+
+        foreach (KeyPrompt3D prompt in activePrompts)
+        {
+            if (prompt == null)
+                continue;
+
+            if (prompt.keySymbol != symbol)
+                continue;
+
+            Renderer promptRenderer = prompt.GetComponentInChildren<Renderer>();
+
+            float promptRadius = 0.15f;
+
+            if (promptRenderer != null)
+            {
+                Vector3 size = promptRenderer.bounds.size;
+                promptRadius = Mathf.Max(size.x, size.y, size.z) * 0.5f;
+            }
+
+            promptRadius += extraHitMargin;
+
+            Vector3 startToPrompt = prompt.transform.position - start;
+            float progress = Vector3.Dot(startToPrompt, directionNormalized);
+
+            bool isTouchingZone =
+                progress + promptRadius >= 0f &&
+                progress - promptRadius <= zoneLength;
+
+            if (isTouchingZone)
+            {
+                if (progress > bestProgress)
+                {
+                    bestProgress = progress;
+                    bestPrompt = prompt;
+                }
+            }
+        }
+
+        return bestPrompt;
     }
 
     public void OnPromptMissed(KeyPrompt3D prompt)
@@ -307,22 +362,12 @@ public class KeyboardMinigameController : MonoBehaviour
         if (!isRunning || isFinished)
             return;
 
+        PlaySound(missSound);
+
         if (activePrompts.Contains(prompt))
             activePrompts.Remove(prompt);
 
         AddError();
-    }
-
-    IEnumerator FailAndRestartRoutine()
-    {
-        if (isFinished) yield break;
-
-        isRunning = false;
-
-        if (spawnRoutine != null)
-            StopCoroutine(spawnRoutine);
-
-        ClearAllPrompts();
 
         if (keyLights != null)
         {
@@ -331,8 +376,30 @@ public class KeyboardMinigameController : MonoBehaviour
             keyLights.FlashError(KeySymbolType.D);
             keyLights.FlashError(KeySymbolType.F);
         }
+    }
 
-        Debug.Log("[KeyboardMinigame] Fallaste. Reiniciando...");
+    void AddError()
+    {
+        currentErrors++;
+        currentScore = Mathf.Max(0, currentScore - penaltyOnMiss);
+
+        if (currentErrors >= maxErrors)
+            StartCoroutine(FailAndRestartRoutine());
+    }
+
+    IEnumerator FailAndRestartRoutine()
+    {
+        if (isFinished)
+            yield break;
+
+        PlaySound(failSound);
+
+        isRunning = false;
+
+        if (spawnRoutine != null)
+            StopCoroutine(spawnRoutine);
+
+        ClearAllPrompts();
 
         yield return new WaitForSeconds(1f);
 
@@ -341,7 +408,10 @@ public class KeyboardMinigameController : MonoBehaviour
 
     IEnumerator WinRoutine()
     {
-        if (isFinished) yield break;
+        if (isFinished)
+            yield break;
+
+        PlaySound(winSound);
 
         isFinished = true;
         isRunning = false;
@@ -359,8 +429,6 @@ public class KeyboardMinigameController : MonoBehaviour
             keyLights.Flash(KeySymbolType.F);
         }
 
-        Debug.Log("[KeyboardMinigame] Ganaste");
-
         yield return new WaitForSeconds(closePanelDelay);
 
         if (machineOwner != null)
@@ -370,8 +438,14 @@ public class KeyboardMinigameController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[KeyboardMinigame] No tiene MachineOwner. Se ganó pero no cerró panel.");
+            Debug.LogWarning("No hay MachineOwner asignado.");
         }
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip, audioVolume);
     }
 
     void ClearAllPrompts()
@@ -389,6 +463,7 @@ public class KeyboardMinigameController : MonoBehaviour
             for (int i = promptContainer.childCount - 1; i >= 0; i--)
             {
                 Transform child = promptContainer.GetChild(i);
+
                 if (child != null)
                     Destroy(child.gameObject);
             }
