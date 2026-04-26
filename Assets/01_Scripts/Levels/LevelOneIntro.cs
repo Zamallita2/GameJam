@@ -58,6 +58,13 @@ public class LevelOneIntro : MonoBehaviour
         if (playIntroOnStart)
             IniciarIntro();
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TerminarIntro();
+        }
+    }
 
     public void IniciarIntro()
     {

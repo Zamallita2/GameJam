@@ -13,11 +13,18 @@ public class GearPanel : MonoBehaviour
     public Material lampNormal;
     public Material lampOk;
     public Material lampError;
+    public Camera main;
 
     [Header("Canvas")]
     public CanvasColorPanel canvasPanel;
 
     private bool panelDone = false;
+    public MachineInteraction machineOwner;
+    private float timer=0;
+    private bool isMove=false;
+
+    public float ajustarX=-0.7f;
+    public float ajustarY=-0.4f;
 
     void Start()
     {
@@ -48,12 +55,21 @@ public class GearPanel : MonoBehaviour
     }
     void Update()
     {
+        if (timer > 0.5 && !isMove)
+        {
+            transform.position += new Vector3(ajustarX,ajustarY, -0.11f);  
+            isMove=true;
+        }
+        else if(!isMove)
+        {
+            timer+=Time.deltaTime;
+        }
         if (panelDone) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector2 mousePos = Mouse.current.position.ReadValue();
-            Ray ray = Camera.main.ScreenPointToRay(mousePos);
+            Ray ray =main.ScreenPointToRay(mousePos);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
@@ -115,5 +131,7 @@ public class GearPanel : MonoBehaviour
             canvasPanel.SetGreen();
 
         Debug.Log("Panel Engranajes completado!");
+        machineOwner.MarcarMaquinaReparada();
+        machineOwner.CerrarPanelDesdeMinijuego();
     }
 }
