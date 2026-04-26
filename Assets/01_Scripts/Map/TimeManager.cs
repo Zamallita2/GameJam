@@ -101,6 +101,15 @@ public class TimeManager : MonoBehaviour
 
     void GameOver()
     {
+        if (!isGameOver)
+        {
+            AudioSource[] allAudio = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+
+            foreach (var a in allAudio)
+            {
+                a.Stop();
+            }
+        }
         isGameOver = true;
 
         if (gameOverPanel != null)

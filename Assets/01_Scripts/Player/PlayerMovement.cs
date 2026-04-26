@@ -25,17 +25,33 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isFirstPerson = false;
 
+    [Header("Audio Sources")]
+    public AudioSource source;
+
+    [Header("Clips")]
+    public AudioClip Walk;
+    public AudioClip Run;
+    private bool isWalk=false;
+    private bool isRun=false;
+
+    [Header("Volúmenes")]
+    [Range(0f, 1f)] public float volWalk = 0.5f;
+    [Range(0f, 1f)] public float volRun = 0.5f;
+
     void Awake()
     {
         if (rb == null)
             rb = GetComponent<Rigidbody>();
 
         currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
+        if (source == null)
+            source = gameObject.AddComponent<AudioSource>();
     }
 
     void Start()
     {
         currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
+        source.loop = true;
     }
 
     void Update()
@@ -177,16 +193,51 @@ public class PlayerMovement : MonoBehaviour
         float moveAmount = horizontalVelocity.magnitude;
 
         if (isRunning && moveAmount > 0.15f)
+        {
             currentAnimator.SetFloat("Speed", 1f);
+            if (!isRun)
+            {
+                CambiarStep(Run, volRun,true);
+            }
+        }
         else if (moveAmount > 0.05f)
+        {
             currentAnimator.SetFloat("Speed", 0.5f);
+            if (!isWalk)
+            {
+                CambiarStep(Walk, volWalk,false);
+            }
+        }
         else
+        {
             currentAnimator.SetFloat("Speed", 0f);
+            source.Stop();
+            isRun=false;
+            isWalk=false;
+        }
     }
 
     public void SetFirstPerson(bool value)
     {
         isFirstPerson = value;
         currentAnimator = isFirstPerson ? armsAnimator : thirdPersonAnimator;
+    }
+    void CambiarStep(AudioClip clip, float vol, bool si)
+    {
+        if (si) 
+        {
+            isRun=true;
+            isWalk=false;
+        }
+        else
+        {
+            isRun=false;
+            isWalk=true;
+        }
+        source.Stop();
+        source.clip = clip;
+        source.volume = vol;
+        source.loop = true;
+        source.Play();
     }
 }

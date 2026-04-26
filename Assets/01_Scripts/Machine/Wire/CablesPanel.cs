@@ -55,6 +55,20 @@ public class CablesPanel : MonoBehaviour
         new Color(0.54f, 0.17f, 0.89f)
     };
 
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip wireSound;
+    public AudioClip connecSound;
+    public AudioClip errorSound;
+    public AudioClip completeSound;
+    private void Awake() {
+        if (audioSource == null)
+                audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
     void OnEnable()
     {
         SetupPanel();
@@ -257,6 +271,7 @@ public class CablesPanel : MonoBehaviour
 
         if (node.isOrigin && selectedOrigin == null)
         {
+            audioSource.PlayOneShot(wireSound);
             selectedOrigin = node;
             StartCable();
             return;
@@ -308,6 +323,7 @@ public class CablesPanel : MonoBehaviour
         if (target.id == selectedOrigin.id)
         {
             Debug.Log("Cable correcto");
+            audioSource.PlayOneShot(connecSound);
 
             selectedOrigin.isConnected = true;
             target.isConnected = true;
@@ -318,6 +334,7 @@ public class CablesPanel : MonoBehaviour
         else
         {
             Debug.Log("Cable incorrecto");
+            audioSource.PlayOneShot(errorSound);
             CancelCable();
 
             FindAnyObjectByType<LevelOneDialogueController>()?.CablesError();
@@ -345,7 +362,7 @@ public class CablesPanel : MonoBehaviour
             if (!node.isConnected)
                 return;
         }
-
+        audioSource.PlayOneShot(completeSound);
         Debug.Log("TODOS LOS CABLES CONECTADOS");
         StartCoroutine(CompleteCablePanelRoutine());
     }

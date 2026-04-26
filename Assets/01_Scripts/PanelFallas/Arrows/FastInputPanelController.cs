@@ -20,7 +20,7 @@ public class PromptLane
 
 public class FastInputPanelController : MonoBehaviour
 {
-    [Header("Botones físicos")]
+    [Header("Botones fï¿½sicos")]
     public List<FastInputButton3D> inputButtons = new List<FastInputButton3D>();
 
     [Header("Prompt prefab")]
@@ -33,10 +33,10 @@ public class FastInputPanelController : MonoBehaviour
     [Header("Visuales de prompts")]
     public List<PromptVisualEntry> promptVisuals = new List<PromptVisualEntry>();
 
-    [Header("Lámparas")]
+    [Header("Lï¿½mparas")]
     public List<StatusLampa> statusLamps = new List<StatusLampa>();
 
-    [Header("Cámara")]
+    [Header("Cï¿½mara")]
     public Camera inputCamera;
     public LayerMask buttonLayerMask = ~0;
 
@@ -56,7 +56,7 @@ public class FastInputPanelController : MonoBehaviour
     public bool loseOnMiss = false;
     public int penaltyOnMiss = 1;
 
-    [Header("Generación")]
+    [Header("Generaciï¿½n")]
     [Range(0f, 1f)] public float arrowChance = 0.65f;
     public int maxPromptsOnScreen = 6;
 
@@ -64,6 +64,7 @@ public class FastInputPanelController : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip wrongSound;
     public AudioClip correctSound;
+    public AudioClip buttontSound;
 
     [Header("Final")]
     public float closePanelDelay = 1f;
@@ -301,6 +302,7 @@ public class FastInputPanelController : MonoBehaviour
         StartCoroutine(button.FlashPressed(0.12f));
 
         currentScore += scorePerHit;
+        audioSource.PlayOneShot(buttontSound);
 
         if (currentScore >= targetScore)
             StartCoroutine(SuccessRoutine());
