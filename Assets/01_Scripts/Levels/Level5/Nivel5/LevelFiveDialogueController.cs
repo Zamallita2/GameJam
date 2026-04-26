@@ -2,12 +2,7 @@
 
 public class LevelFiveDialogueController : MonoBehaviour
 {
-    [Header("INTRO NIVEL 5")]
-    public AudioClip audioIntro1AccesoNucleo;
-    public AudioClip audioIntro2DemasiadoLejos;
-    public AudioClip audioIntro3NoAccidental;
-    public AudioClip audioIntro4Refallas;
-    public AudioClip audioIntro5SistemaAprende;
+  
 
     [Header("GENERALES")]
     public AudioClip audioModuloActivo;
@@ -95,34 +90,7 @@ public class LevelFiveDialogueController : MonoBehaviour
     // INTRO NIVEL 5
     // =========================
 
-    public void Intro1AccesoNucleo()
-    {
-        Show("Inicializando acceso al núcleo...", audioIntro1AccesoNucleo);
-    }
-
-    public void Intro2DemasiadoLejos()
-    {
-        Show("Operador...\nhas llegado demasiado lejos.", audioIntro2DemasiadoLejos);
-    }
-    public void Intro3NoAccidental()
-    {
-        Show("Todos los modulos estana activos, pero el sistema ya no responde como antes.", audioIntro3NoAccidental);
-    }
-  //  public void IntroNoAccidental()
-  //  {
-   //     Show("Las fallas no son accidentales.", audioIntro3NoAccidental);
-  //  }
-
-    public void Intro4Refallas()
-    {
-        Show("Cada módulo que repares...\nvolverá a fallar.", audioIntro4Refallas);
-    }
-
-    public void Intro5SistemaAprende()
-    {
-        Show("Ten cuidado.\nEl sistema está aprendiendo de ti.", audioIntro5SistemaAprende);
-    }
-
+ 
     // =========================
     // GENERALES
     // =========================

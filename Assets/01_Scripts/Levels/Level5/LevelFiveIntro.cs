@@ -15,6 +15,7 @@ public class LevelFiveIntro : MonoBehaviour
     public AudioClip audioFallasNoAccidentales;
     public AudioClip audioVuelvenAFallar;
     public AudioClip audioDecidir;
+    public AudioClip audioDecidir2;
     public AudioClip audioSistemaAprende;
 
     private DialogueManager dm;
@@ -38,7 +39,8 @@ public class LevelFiveIntro : MonoBehaviour
             "Todos los módulos están activos...\npero el sistema ya no responde como antes.",
             "Las fallas no son accidentales.\nAlgo dentro del núcleo las está provocando.",
             "Cada sistema que repares...\nvolverá a fallar.",
-            "No podrás estabilizar todo al mismo tiempo.\nDebes decidir qué mantener activo.",
+            "No podrás estabilizar todo al mismo tiempo.",
+            "Debes decidir qué mantener activo y que dejar caer.",
             "Ten cuidado, operador...\nel sistema está aprendiendo de ti."
         };
 
@@ -50,6 +52,7 @@ public class LevelFiveIntro : MonoBehaviour
             audioFallasNoAccidentales,
             audioVuelvenAFallar,
             audioDecidir,
+            audioDecidir2,
             audioSistemaAprende
         };
 
