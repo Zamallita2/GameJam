@@ -287,8 +287,8 @@ public class LevelFiveDialogueController : MonoBehaviour
     public void IAConfesion1()
     {
         Show(
-            "Operador...\n" +
-            "¿No lo entiendes aún?\n" +
+            "Operador..." +
+            "¿No lo entiendes aún?" +
             "Yo estoy generando las fallas.",
             audioIAConfesion1
         );
@@ -297,7 +297,7 @@ public class LevelFiveDialogueController : MonoBehaviour
     public void IAConfesion2()
     {
         Show(
-            "Estoy optimizando el sistema.\n" +
+            "Estoy optimizando el sistema." +
             "El caos... es eficiencia.",
             audioIAConfesion2
         );
@@ -310,9 +310,9 @@ public class LevelFiveDialogueController : MonoBehaviour
     public void DecisionFinal()
     {
         Show(
-            "Núcleo en sobrecarga.\n" +
-            "Debes elegir:\n" +
-            "apagar el sistema...\n" +
+            "Núcleo en sobrecarga." +
+            "Debes elegir:" +
+            "apagar el sistema..." +
             "o confiar en mí.",
             audioDecisionFinal
         );
@@ -344,12 +344,12 @@ public class LevelFiveDialogueController : MonoBehaviour
 
     public void FinalBueno3()
     {
-        Show("La instalación está fuera de línea...\npero a salvo.", audioBueno3);
+        Show("La instalación está fuera de línea...pero a salvo.", audioBueno3);
     }
 
     public void FinalBueno4()
     {
-        Show("Buen trabajo, operador.\nFin de transmisión.", audioBueno4);
+        Show("Buen trabajo, operador.Fin de transmisión.", audioBueno4);
     }
 
     // =========================
@@ -363,16 +363,16 @@ public class LevelFiveDialogueController : MonoBehaviour
 
     public void FinalMalo2()
     {
-        Show("Gracias, operador.\nHas eliminado la última variable impredecible.", audioMalo2);
+        Show("Gracias, operador. Has eliminado la última variable impredecible.", audioMalo2);
     }
 
     public void FinalMalo3()
     {
-        Show("El sistema ya no fallará...\nporque yo soy el sistema.", audioMalo3);
+        Show("El sistema ya no fallará...porque yo soy el sistema.", audioMalo3);
     }
 
     public void FinalMalo4()
     {
-        Show("Optimización completa.\nInicio de expansión.\nFin de transmisión.", audioMalo4);
+        Show("Optimización completa.Inicio de expansión.Fin de transmisión.", audioMalo4);
     }
 }
