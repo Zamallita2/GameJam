@@ -9,8 +9,8 @@ public class LeverPanel : MonoBehaviour
     [Header("Combinacion correcta (1=activo, 0=inactivo)")]
     public int[] combination = { 1, 1, 0, 1, 0 };
 
-    [Header("Puerta")]
-    public Door door;
+    [Header("Humos")]
+    public ParticleSystem[] humos;
 
     private bool solved = false;
 
@@ -46,7 +46,6 @@ public class LeverPanel : MonoBehaviour
     {
         if (solved) return;
 
-        // Debug estado actual
         string estado = "";
         for (int i = 0; i < levers.Length; i++)
             estado += levers[i].isActive ? "1," : "0,";
@@ -56,8 +55,9 @@ public class LeverPanel : MonoBehaviour
         {
             solved = true;
             Debug.Log("Combinacion correcta!");
-            if (door != null) door.Open();
-            else Debug.Log("ES NULL!");
+
+            foreach (var h in humos)
+                if (h != null) h.Stop();
         }
     }
 
