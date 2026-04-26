@@ -5,15 +5,15 @@ public class LevelTwoCompletionManager : MonoBehaviour
 {
     public static LevelTwoCompletionManager Instance;
 
-    [Header("Cantidad de m�quinas a reparar")]
+    [Header("Cantidad de máquinas a reparar")]
     public int totalMachines = 4;
 
     [Header("Luces")]
     public float lightDisableRadius = 1f;
 
     [Header("Siguiente escena")]
-    public string nextSceneName = "Nivel2";
-    public float delayBeforeNextScene = 6f;
+    public string nextSceneName = "Nivel3";
+    public float delayBeforeNextScene = 11f;
 
     [Header("Audio final opcional")]
     public AudioClip finalVoice;
@@ -30,10 +30,7 @@ public class LevelTwoCompletionManager : MonoBehaviour
 
     void Start()
     {
-        // encuentra TODAS las luces autom�ticamente
-        allLights = FindObjectsByType<LightFlicker>(
-            FindObjectsSortMode.None
-        );
+        allLights = FindObjectsByType<LightFlicker>(FindObjectsSortMode.None);
     }
 
     public void RegisterMachineRepaired(Transform machine)
@@ -42,17 +39,12 @@ public class LevelTwoCompletionManager : MonoBehaviour
 
         repairedMachines++;
 
-        Debug.Log(
-            $"[LevelTwoCompletion] M�quinas reparadas: " +
-            $"{repairedMachines}/{totalMachines}"
-        );
+        Debug.Log("[LevelTwoCompletion] Máquinas reparadas: " + repairedMachines + "/" + totalMachines);
 
         DisableNearbyLights(machine);
 
         if (repairedMachines >= totalMachines)
-        {
             FinishLevel();
-        }
     }
 
     void DisableNearbyLights(Transform machine)
@@ -62,16 +54,10 @@ public class LevelTwoCompletionManager : MonoBehaviour
             if (light == null || light.isTurnedOff)
                 continue;
 
-            float distance =
-                Vector3.Distance(
-                    machine.position,
-                    light.transform.position
-                );
+            float distance = Vector3.Distance(machine.position, light.transform.position);
 
             if (distance <= lightDisableRadius)
-            {
                 light.TurnOff();
-            }
         }
     }
 
@@ -79,13 +65,20 @@ public class LevelTwoCompletionManager : MonoBehaviour
     {
         levelFinished = true;
 
-        DialogueManager dm =
-            FindAnyObjectByType<DialogueManager>();
+        TimeManager time = FindAnyObjectByType<TimeManager>();
+        if (time != null)
+            time.timerPausado = true;
+
+        FollowPlayer alarm = FindAnyObjectByType<FollowPlayer>();
+        if (alarm != null)
+            alarm.DetenerAlarma();
+
+        DialogueManager dm = FindAnyObjectByType<DialogueManager>();
 
         if (dm != null)
         {
             dm.ShowMessage(
-                "Todos los m�dulos han sido restaurados. " +
+                "Todos los módulos han sido restaurados. " +
                 "El sistema vuelve a estar estable. " +
                 "Excelente trabajo, operador. " +
                 "Preparando siguiente zona...",

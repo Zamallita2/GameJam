@@ -104,6 +104,10 @@ public class LevelFourCompletionManager : MonoBehaviour
         if (time != null)
             time.timerPausado = true;
 
+        FollowPlayer alarm = FindAnyObjectByType<FollowPlayer>();
+        if (alarm != null)
+            alarm.DetenerAlarma();
+
         pasoActual = 0;
         MostrarPasoFinal();
     }

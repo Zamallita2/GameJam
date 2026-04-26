@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelFiveCompletionManager : MonoBehaviour
 {
@@ -26,9 +27,13 @@ public class LevelFiveCompletionManager : MonoBehaviour
     public GameObject finalMaloPanel;
 
     [Header("Tiempos diálogo")]
-    public float pausaEntreDialogos = 0.6f;
-    public float extraSinAudio = 2.5f;
+    public float pausaEntreDialogos = 0.8f;
+    public float extraSinAudio = 4f;
     public float delayMostrarPanelFinal = 1f;
+
+    [Header("Escenas botones finales")]
+    public string nivelInicial = "Nivel1";
+    public string menuScene = "MenuScene";
 
     private EstadoFinal estado = EstadoFinal.Jugando;
 
@@ -103,7 +108,6 @@ public class LevelFiveCompletionManager : MonoBehaviour
         if (reparadas.Count == 2 && faseCaos == 0)
         {
             faseCaos = 1;
-
             RomperCantidad(1);
 
             if (dialogue != null)
@@ -112,7 +116,6 @@ public class LevelFiveCompletionManager : MonoBehaviour
         else if (reparadas.Count == 3 && faseCaos == 1)
         {
             faseCaos = 2;
-
             RomperCantidad(2);
 
             if (dialogue != null)
@@ -121,13 +124,12 @@ public class LevelFiveCompletionManager : MonoBehaviour
         else if (reparadas.Count >= 4 && faseCaos == 2)
         {
             faseCaos = 3;
-
             RomperTodas();
 
             if (dialogue != null)
                 dialogue.TodasFallan();
 
-            Invoke(nameof(MostrarConfesion), 2.5f);
+            Invoke(nameof(MostrarConfesionUno), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioTodasFallan : null));
         }
     }
 
@@ -158,12 +160,12 @@ public class LevelFiveCompletionManager : MonoBehaviour
         reparadas.Clear();
     }
 
-    void MostrarConfesion()
+    void MostrarConfesionUno()
     {
         if (dialogue != null)
             dialogue.IAConfesion1();
 
-        Invoke(nameof(MostrarConfesionDos), 4f);
+        Invoke(nameof(MostrarConfesionDos), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioIAConfesion1 : null));
     }
 
     void MostrarConfesionDos()
@@ -171,7 +173,15 @@ public class LevelFiveCompletionManager : MonoBehaviour
         if (dialogue != null)
             dialogue.IAConfesion2();
 
-        Invoke(nameof(MostrarDecision), 4f);
+        Invoke(nameof(MostrarConfesionTres), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioIAConfesion2 : null));
+    }
+
+    void MostrarConfesionTres()
+    {
+        if (dialogue != null)
+            dialogue.IAConfesion3();
+
+        Invoke(nameof(MostrarDecision), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioIAConfesion3 : null));
     }
 
     void MostrarDecision()
@@ -181,6 +191,11 @@ public class LevelFiveCompletionManager : MonoBehaviour
         if (dialogue != null)
             dialogue.DecisionFinal();
 
+        Invoke(nameof(ActivarPanelDecision), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioDecisionFinal : null));
+    }
+
+    void ActivarPanelDecision()
+    {
         if (decisionPanel != null)
             decisionPanel.SetActive(true);
 
@@ -215,7 +230,12 @@ public class LevelFiveCompletionManager : MonoBehaviour
         if (decisionPanel != null)
             decisionPanel.SetActive(false);
 
-        IniciarDialogosFinalMalo();
+        DetenerTiempoYAlarma();
+
+        if (dialogue != null)
+            dialogue.ElegirMalo();
+
+        Invoke(nameof(IniciarDialogosFinalMalo), ObtenerDuracionSeguro(dialogue != null ? dialogue.audioElegirMalo : null));
     }
 
     void ActivarFinalBuenoLogrado()
@@ -223,6 +243,8 @@ public class LevelFiveCompletionManager : MonoBehaviour
         if (estado != EstadoFinal.FinalBuenoActivo) return;
 
         estado = EstadoFinal.FinalBuenoLogrado;
+
+        DetenerTiempoYAlarma();
 
         IniciarDialogosFinalBueno();
     }
@@ -233,7 +255,22 @@ public class LevelFiveCompletionManager : MonoBehaviour
 
         estado = EstadoFinal.FinalMalo;
 
+        DetenerTiempoYAlarma();
+
         IniciarDialogosFinalMalo();
+    }
+
+    void DetenerTiempoYAlarma()
+    {
+        CancelInvoke();
+
+        TimeManager time = FindAnyObjectByType<TimeManager>();
+        if (time != null)
+            time.timerPausado = true;
+
+        FollowPlayer alarm = FindAnyObjectByType<FollowPlayer>();
+        if (alarm != null)
+            alarm.DetenerAlarma();
     }
 
     void IniciarDialogosFinalBueno()
@@ -266,10 +303,11 @@ public class LevelFiveCompletionManager : MonoBehaviour
             return;
         }
 
-        MostrarTextoFinal(textosFinal[pasoActual], audiosFinal[pasoActual]);
+        AudioClip audioActual = audiosFinal[pasoActual];
+        MostrarTextoFinal(textosFinal[pasoActual], audioActual);
 
         pasoActual++;
-        Invoke(nameof(MostrarPasoFinalBueno), ObtenerDuracionPaso(audiosFinal[pasoActual - 1]));
+        Invoke(nameof(MostrarPasoFinalBueno), ObtenerDuracionSeguro(audioActual));
     }
 
     void MostrarPanelFinalBueno()
@@ -311,10 +349,11 @@ public class LevelFiveCompletionManager : MonoBehaviour
             return;
         }
 
-        MostrarTextoFinal(textosFinal[pasoActual], audiosFinal[pasoActual]);
+        AudioClip audioActual = audiosFinal[pasoActual];
+        MostrarTextoFinal(textosFinal[pasoActual], audioActual);
 
         pasoActual++;
-        Invoke(nameof(MostrarPasoFinalMalo), ObtenerDuracionPaso(audiosFinal[pasoActual - 1]));
+        Invoke(nameof(MostrarPasoFinalMalo), ObtenerDuracionSeguro(audioActual));
     }
 
     void MostrarPanelFinalMalo()
@@ -335,11 +374,23 @@ public class LevelFiveCompletionManager : MonoBehaviour
             dm.ShowMessage(texto, audio);
     }
 
-    float ObtenerDuracionPaso(AudioClip audio)
+    float ObtenerDuracionSeguro(AudioClip audio)
     {
         if (audio != null)
-            return audio.length + pausaEntreDialogos;
+            return Mathf.Max(audio.length + pausaEntreDialogos, extraSinAudio);
 
         return extraSinAudio;
+    }
+
+    public void JugarDeNuevo()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nivelInicial);
+    }
+
+    public void IrAlMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(menuScene);
     }
 }

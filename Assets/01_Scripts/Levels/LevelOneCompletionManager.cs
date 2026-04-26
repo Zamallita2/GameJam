@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelOneCompletionManager : MonoBehaviour
 {
     public static LevelOneCompletionManager Instance;
 
-    [Header("Cantidad de m�quinas a reparar")]
+    [Header("Cantidad de máquinas a reparar")]
     public int totalMachines = 4;
 
     [Header("Luces")]
@@ -13,7 +13,7 @@ public class LevelOneCompletionManager : MonoBehaviour
 
     [Header("Siguiente escena")]
     public string nextSceneName = "Nivel2";
-    public float delayBeforeNextScene = 6f;
+    public float delayBeforeNextScene = 11f;
 
     [Header("Audio final opcional")]
     public AudioClip finalVoice;
@@ -30,10 +30,7 @@ public class LevelOneCompletionManager : MonoBehaviour
 
     void Start()
     {
-        // encuentra TODAS las luces autom�ticamente
-        allLights = FindObjectsByType<LightFlicker>(
-            FindObjectsSortMode.None
-        );
+        allLights = FindObjectsByType<LightFlicker>(FindObjectsSortMode.None);
     }
 
     public void RegisterMachineRepaired(Transform machine)
@@ -42,17 +39,12 @@ public class LevelOneCompletionManager : MonoBehaviour
 
         repairedMachines++;
 
-        Debug.Log(
-            $"[LevelOneCompletion] M�quinas reparadas: " +
-            $"{repairedMachines}/{totalMachines}"
-        );
+        Debug.Log("[LevelOneCompletion] Máquinas reparadas: " + repairedMachines + "/" + totalMachines);
 
         DisableNearbyLights(machine);
 
         if (repairedMachines >= totalMachines)
-        {
             FinishLevel();
-        }
     }
 
     void DisableNearbyLights(Transform machine)
@@ -62,16 +54,10 @@ public class LevelOneCompletionManager : MonoBehaviour
             if (light == null || light.isTurnedOff)
                 continue;
 
-            float distance =
-                Vector3.Distance(
-                    machine.position,
-                    light.transform.position
-                );
+            float distance = Vector3.Distance(machine.position, light.transform.position);
 
             if (distance <= lightDisableRadius)
-            {
                 light.TurnOff();
-            }
         }
     }
 
@@ -79,13 +65,23 @@ public class LevelOneCompletionManager : MonoBehaviour
     {
         levelFinished = true;
 
-        DialogueManager dm =
-            FindAnyObjectByType<DialogueManager>();
+        // 🔥 PAUSAR TIEMPO
+        TimeManager time = FindAnyObjectByType<TimeManager>();
+        if (time != null)
+            time.timerPausado = true;
+
+        // 🔥 APAGAR ALARMA
+        FollowPlayer alarm = FindAnyObjectByType<FollowPlayer>();
+        if (alarm != null)
+            alarm.DetenerAlarma();
+
+        // 🔥 MOSTRAR DIÁLOGO FINAL
+        DialogueManager dm = FindAnyObjectByType<DialogueManager>();
 
         if (dm != null)
         {
             dm.ShowMessage(
-                "Todos los m�dulos han sido restaurados. " +
+                "Todos los módulos han sido restaurados. " +
                 "El sistema vuelve a estar estable. " +
                 "Excelente trabajo, operador. " +
                 "Preparando siguiente zona...",

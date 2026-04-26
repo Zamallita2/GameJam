@@ -206,9 +206,7 @@ public class MachineDialogueTrigger : MonoBehaviour
                 levelFiveDialogue.TeclasIntro();
                 break;
 
-            case MachineDialogueType.Palancas:
-                levelFiveDialogue.PalancasIntro();
-                break;
+          
         }
     }
 

@@ -17,10 +17,11 @@ public class FollowPlayer : MonoBehaviour
     [Range(0f, 1f)] public float volAlarm = 0.5f;
     [Range(0f, 1f)] public float volClock1 = 0.5f;
     [Range(0f, 1f)] public float volClock2 = 0.8f;
-    public float porcentajeBuscado=0.9f;
+    public float porcentajeBuscado = 0.9f;
 
     private TimeManager timeManager;
     private bool cambiado = false;
+    private bool audioDetenido = false;
 
     void Awake()
     {
@@ -31,35 +32,41 @@ public class FollowPlayer : MonoBehaviour
             clockSource = gameObject.AddComponent<AudioSource>();
 
         timeManager = GetComponent<TimeManager>();
+        if (timeManager == null)
+            timeManager = FindAnyObjectByType<TimeManager>();
     }
 
     void Start()
     {
-        // 🎶 Alarm SIEMPRE
-        alarmSource.clip = alarm;
-        alarmSource.loop = true;
-        alarmSource.volume = volAlarm;
-        alarmSource.Play();
+        if (alarmSource != null && alarm != null)
+        {
+            alarmSource.clip = alarm;
+            alarmSource.loop = true;
+            alarmSource.volume = volAlarm;
+            alarmSource.Play();
+        }
 
-        // ⏰ Clock1 inicio
-        clockSource.clip = clock1;
-        clockSource.loop = true;
-        clockSource.volume = volClock1;
-        clockSource.Play();
+        if (clockSource != null && clock1 != null)
+        {
+            clockSource.clip = clock1;
+            clockSource.loop = true;
+            clockSource.volume = volClock1;
+            clockSource.Play();
+        }
     }
 
     void Update()
     {
-        // Follow player 🐾
         if (player != null && player.gameObject.activeInHierarchy)
             transform.position = player.position;
 
-        // Cambio al 90% ⏰⚠️
+        if (audioDetenido) return;
+
         if (timeManager != null && !cambiado)
         {
             float porcentaje = timeManager.timer / timeManager.limitTime;
 
-            if (porcentaje >=porcentajeBuscado)
+            if (porcentaje >= porcentajeBuscado)
             {
                 CambiarAClock2();
                 cambiado = true;
@@ -69,10 +76,23 @@ public class FollowPlayer : MonoBehaviour
 
     void CambiarAClock2()
     {
+        if (clockSource == null || clock2 == null) return;
+
         clockSource.Stop();
         clockSource.clip = clock2;
         clockSource.volume = volClock2;
         clockSource.loop = true;
         clockSource.Play();
+    }
+
+    public void DetenerAlarma()
+    {
+        audioDetenido = true;
+
+        if (alarmSource != null)
+            alarmSource.Stop();
+
+        if (clockSource != null)
+            clockSource.Stop();
     }
 }

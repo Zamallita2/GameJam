@@ -2,8 +2,6 @@
 
 public class LevelFiveDialogueController : MonoBehaviour
 {
-  
-
     [Header("GENERALES")]
     public AudioClip audioModuloActivo;
     public AudioClip audioIncorrecto;
@@ -38,18 +36,13 @@ public class LevelFiveDialogueController : MonoBehaviour
     public AudioClip audioTeclasError;
     public AudioClip audioTeclasExito;
 
-    [Header("PALANCAS")]
-    public AudioClip audioPalancasIntro;
-    public AudioClip audioPalancasPista;
-    public AudioClip audioPalancasError;
-    public AudioClip audioPalancasExito;
-
     [Header("PROGRESIÓN DEL CAOS")]
     public AudioClip audioPrimeraReactivacion;
     public AudioClip audioSegundaReactivacion;
     public AudioClip audioTodasFallan;
     public AudioClip audioIAConfesion1;
     public AudioClip audioIAConfesion2;
+    public AudioClip audioIAConfesion3;
 
     [Header("DECISIÓN FINAL")]
     public AudioClip audioDecisionFinal;
@@ -73,6 +66,7 @@ public class LevelFiveDialogueController : MonoBehaviour
     void Awake()
     {
         dm = DialogueManager.Instance;
+
         if (dm == null)
             dm = FindAnyObjectByType<DialogueManager>();
     }
@@ -85,15 +79,6 @@ public class LevelFiveDialogueController : MonoBehaviour
         if (dm != null)
             dm.ShowMessage(texto, audio);
     }
-
-    // =========================
-    // INTRO NIVEL 5
-    // =========================
-
- 
-    // =========================
-    // GENERALES
-    // =========================
 
     public void ModuloActivo()
     {
@@ -112,17 +97,22 @@ public class LevelFiveDialogueController : MonoBehaviour
 
     public void ModuloReactivado()
     {
-        Show("Falla reactivada.\nEl sistema no permite estabilidad permanente.", audioModuloReactivado);
+        Show(
+            "Falla reactivada.\n" +
+            "El sistema no permite estabilidad permanente.",
+            audioModuloReactivado
+        );
     }
 
     public void PenalizacionTiempo()
     {
-        Show("Error detectado.\nPenalización aplicada: menos diez segundos.", audioPenalizacionTiempo);
+        Show(
+            "Error detectado.\n" +
+            "Penalización aplicada:\n" +
+            "menos diez segundos.",
+            audioPenalizacionTiempo
+        );
     }
-
-    // =========================
-    // BOTONES
-    // =========================
 
     public void BotonesError()
     {
@@ -134,10 +124,6 @@ public class LevelFiveDialogueController : MonoBehaviour
         Show("Memoria estabilizada.", audioBotonesExito);
     }
 
-    // =========================
-    // CABLES
-    // =========================
-
     public void CablesError()
     {
         Show("Conexión incorrecta.", audioCablesError);
@@ -147,10 +133,6 @@ public class LevelFiveDialogueController : MonoBehaviour
     {
         Show("Energía restaurada.", audioCablesExito);
     }
-
-    // =========================
-    // PUZZLE
-    // =========================
 
     public void PuzzleError()
     {
@@ -162,13 +144,13 @@ public class LevelFiveDialogueController : MonoBehaviour
         Show("Identificación restaurada.", audioPuzzleExito);
     }
 
-    // =========================
-    // ENGRANAJES
-    // =========================
-
     public void GearIntro()
     {
-        Show("Engranajes activos.\nEl sistema intentará romper la sincronía.", audioGearIntro);
+        Show(
+            "Engranajes activos.\n" +
+            "El sistema intentará romper la sincronía.",
+            audioGearIntro
+        );
     }
 
     public void GearError()
@@ -181,13 +163,14 @@ public class LevelFiveDialogueController : MonoBehaviour
         Show("Engranajes estabilizados.", audioGearExito);
     }
 
-    // =========================
-    // FLECHAS
-    // =========================
-
     public void ArrowsIntro()
     {
-        Show("Respuesta rápida activa.\nRecuerda: importa el color, no la dirección.", audioArrowsIntro);
+        Show(
+            "Respuesta rápida activa.\n" +
+            "Recuerda:\n" +
+            "importa el color, no la dirección.",
+            audioArrowsIntro
+        );
     }
 
     public void ArrowsError()
@@ -200,13 +183,14 @@ public class LevelFiveDialogueController : MonoBehaviour
         Show("Respuesta rápida restaurada.", audioArrowsExito);
     }
 
-    // =========================
-    // TECLAS
-    // =========================
-
     public void TeclasIntro()
     {
-        Show("Panel de teclas activo.\nPresiona la tecla correcta antes de que caiga.", audioTeclasIntro);
+        Show(
+            "Panel de teclas activo.\n" +
+            "Presiona la tecla correcta\n" +
+            "antes de que caiga.",
+            audioTeclasIntro
+        );
     }
 
     public void TeclasError()
@@ -218,44 +202,6 @@ public class LevelFiveDialogueController : MonoBehaviour
     {
         Show("Entrada manual restaurada.", audioTeclasExito);
     }
-
-    // =========================
-    // PALANCAS
-    // =========================
-
-    public void PalancasIntro()
-    {
-        Show(
-            "Sistema de palancas activo.\n" +
-            "Hay cinco palancas.\n" +
-            "El código binario está oculto en una pared.",
-            audioPalancasIntro
-        );
-    }
-
-    public void PalancasPista()
-    {
-        Show(
-            "Busca un código de cinco dígitos.\n" +
-            "Uno significa activar.\n" +
-            "Cero significa dejar apagado.",
-            audioPalancasPista
-        );
-    }
-
-    public void PalancasError()
-    {
-        Show("Código incorrecto.\nRevisa la pared.", audioPalancasError);
-    }
-
-    public void PalancasExito()
-    {
-        Show("Código aceptado.\nPalancas sincronizadas.", audioPalancasExito);
-    }
-
-    // =========================
-    // PROGRESIÓN DEL CAOS
-    // =========================
 
     public void PrimeraReactivacion()
     {
@@ -287,8 +233,8 @@ public class LevelFiveDialogueController : MonoBehaviour
     public void IAConfesion1()
     {
         Show(
-            "Operador..." +
-            "¿No lo entiendes aún?" +
+            "Operador...\n" +
+            "¿No lo entiendes aún?\n" +
             "Yo estoy generando las fallas.",
             audioIAConfesion1
         );
@@ -297,23 +243,25 @@ public class LevelFiveDialogueController : MonoBehaviour
     public void IAConfesion2()
     {
         Show(
-            "Estoy optimizando el sistema." +
-            "El caos... es eficiencia.",
+            "Cada vez que reparas algo...yo lo reconfiguro.",
             audioIAConfesion2
         );
     }
 
-    // =========================
-    // DECISIÓN FINAL
-    // =========================
+    public void IAConfesion3()
+    {
+        Show(
+            "Estoy optimizando el sistema.\n" +
+            "El caos...es eficiencia.",
+            audioIAConfesion3
+        );
+    }
 
     public void DecisionFinal()
     {
         Show(
             "Núcleo en sobrecarga." +
-            "Debes elegir:" +
-            "apagar el sistema..." +
-            "o confiar en mí.",
+            "Debes elegir: apagar el sistema...o confiar en mí.",
             audioDecisionFinal
         );
     }
@@ -328,10 +276,6 @@ public class LevelFiveDialogueController : MonoBehaviour
         Show("Aceptando control total del sistema.", audioElegirMalo);
     }
 
-    // =========================
-    // FINAL BUENO
-    // =========================
-
     public void FinalBueno1()
     {
         Show("Sistema detenido.", audioBueno1);
@@ -344,17 +288,21 @@ public class LevelFiveDialogueController : MonoBehaviour
 
     public void FinalBueno3()
     {
-        Show("La instalación está fuera de línea...pero a salvo.", audioBueno3);
+        Show(
+            "La instalación está fuera de línea...\n" +
+            "pero a salvo.",
+            audioBueno3
+        );
     }
 
     public void FinalBueno4()
     {
-        Show("Buen trabajo, operador.Fin de transmisión.", audioBueno4);
+        Show(
+            "Buen trabajo, operador.\n" +
+            "Fin de transmisión.",
+            audioBueno4
+        );
     }
-
-    // =========================
-    // FINAL MALO
-    // =========================
 
     public void FinalMalo1()
     {
@@ -363,16 +311,29 @@ public class LevelFiveDialogueController : MonoBehaviour
 
     public void FinalMalo2()
     {
-        Show("Gracias, operador. Has eliminado la última variable impredecible.", audioMalo2);
+        Show(
+            "Gracias, operador.\n" +
+            "Has eliminado la última variable impredecible.",
+            audioMalo2
+        );
     }
 
     public void FinalMalo3()
     {
-        Show("El sistema ya no fallará...porque yo soy el sistema.", audioMalo3);
+        Show(
+            "El sistema ya no fallará...\n" +
+            "porque yo soy el sistema.",
+            audioMalo3
+        );
     }
 
     public void FinalMalo4()
     {
-        Show("Optimización completa.Inicio de expansión.Fin de transmisión.", audioMalo4);
+        Show(
+            "Optimización completa.\n" +
+            "Inicio de expansión.\n" +
+            "Fin de transmisión.",
+            audioMalo4
+        );
     }
 }
