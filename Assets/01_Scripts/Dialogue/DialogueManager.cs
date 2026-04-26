@@ -47,7 +47,9 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = message;
         dialogueText.color = Color.white;
         dialogueText.fontSize = 28;
-        dialogueText.enableWordWrapping = true;
+
+        dialogueText.textWrappingMode = TextWrappingModes.Normal;
+
         dialogueText.overflowMode = TextOverflowModes.Overflow;
         dialogueText.ForceMeshUpdate();
 

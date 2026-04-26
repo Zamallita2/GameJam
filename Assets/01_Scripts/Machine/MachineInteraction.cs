@@ -12,7 +12,7 @@ public class MachineInteraction : MonoBehaviour
     [Header("Punto real de interacción")]
     public Transform interactionPoint;
 
-    [Header("Mano del panel (opcional)")]
+    [Header("Mano del panel")]
     public GameObject panelHand;
     public Transform panelPointer;
 
@@ -34,7 +34,6 @@ public class MachineInteraction : MonoBehaviour
     {
         machineType = GetComponent<MachineType>();
         machineGlow = GetComponent<MachineGlow>();
-
         AutoAssignReferences();
     }
 
@@ -81,36 +80,22 @@ public class MachineInteraction : MonoBehaviour
         if (maquinaReparada) return;
 
         if (player == null || panelRoot == null || panelCamera == null || playerCamera == null || machineType == null)
-        {
-            if (mostrarLogs)
-                Debug.LogWarning($"[MachineInteraction] Faltan referencias en {gameObject.name}");
             return;
-        }
 
         Vector3 point = interactionPoint != null ? interactionPoint.position : transform.position;
         float dist = Vector3.Distance(player.transform.position, point);
         bool playerNear = dist <= interactionDistance;
 
-        if (Input.GetKeyDown(interactKey) && mostrarLogs)
-            Debug.Log($"[{gameObject.name}] Distancia = {dist} | Cerca = {playerNear}");
-
         if (playerNear && Input.GetKeyDown(interactKey) && !panelActivo)
-        {
             ActivarPanel();
-        }
 
         if (panelActivo && Input.GetKeyDown(KeyCode.Escape))
-        {
             DesactivarPanel();
-        }
     }
 
     void ActivarPanel()
     {
         panelActivo = true;
-
-        if (mostrarLogs)
-            Debug.Log($"[MachineInteraction] Activando panel: {gameObject.name}");
 
         if (panelRoot != null)
             panelRoot.SetActive(true);
@@ -124,7 +109,6 @@ public class MachineInteraction : MonoBehaviour
         if (panelLoader != null)
             panelLoader.CargarPanel(machineType.tipo, machineType.nivel);
 
-        // 🔥 ASIGNAR MACHINE OWNER A TODOS LOS PANELES
         SimonButtonsPanel simon = panelRoot.GetComponentInChildren<SimonButtonsPanel>(true);
         if (simon != null)
             simon.SetMachineOwner(this);
@@ -137,7 +121,10 @@ public class MachineInteraction : MonoBehaviour
         if (puzzle != null)
             puzzle.SetMachineOwner(this);
 
-        // MANO
+        FastInputPanelController arrows = panelRoot.GetComponentInChildren<FastInputPanelController>(true);
+        if (arrows != null)
+            arrows.SetMachineOwner(this);
+
         if (handManager != null)
         {
             if (panelHand != null && panelPointer != null)
@@ -163,9 +150,6 @@ public class MachineInteraction : MonoBehaviour
     void DesactivarPanel()
     {
         panelActivo = false;
-
-        if (mostrarLogs)
-            Debug.Log($"[MachineInteraction] Desactivando panel: {gameObject.name}");
 
         if (panelLoader != null)
             panelLoader.LimpiarPanelActual();
@@ -207,11 +191,9 @@ public class MachineInteraction : MonoBehaviour
 
         maquinaReparada = true;
 
-        // 🔥 APAGAR BRILLO
         if (machineGlow != null)
             machineGlow.StopGlow();
 
-        // 🔥 ACTUALIZAR OBJETIVOS
         ObjectivesHUD hud = ObjectivesHUD.Instance;
 
         if (hud == null)
@@ -228,46 +210,50 @@ public class MachineInteraction : MonoBehaviour
                 case MachineType.TipoMaquina.Cables:
                     hud.CompleteCables();
                     break;
+
                 case MachineType.TipoMaquina.Puzzle:
                     hud.CompletePuzzle();
                     break;
+
                 case MachineType.TipoMaquina.Gear:
                     hud.CompleteGear();
+                    break;
+
+                case MachineType.TipoMaquina.Arrows:
+                    hud.CompleteArrows();
                     break;
             }
         }
 
-        // 🔥 CONTADOR DE NIVEL
-        MonoBehaviour manager = null;
-
-// Intentar con cada manager
-        manager = LevelOneCompletionManager.Instance;
-        if (manager == null) manager = FindAnyObjectByType<LevelOneCompletionManager>();
-
-        if (manager == null) manager = LevelTwoCompletionManager.Instance;
-        if (manager == null) manager = FindAnyObjectByType<LevelTwoCompletionManager>();
-
-        /*if (manager == null) manager = LevelThreeCompletionManager.Instance;
-        if (manager == null) manager = FindAnyObjectByType<LevelThreeCompletionManager>();
-
-        if (manager == null) manager = LevelFourCompletionManager.Instance;
-        if (manager == null) manager = FindAnyObjectByType<LevelFourCompletionManager>();
-
-        if (manager == null) manager = LevelFiveCompletionManager.Instance;
-        if (manager == null) manager = FindAnyObjectByType<LevelFiveCompletionManager>();*/
-
-        // Usar si encontró alguno
-        if (manager != null)
+        LevelOneCompletionManager m1 = FindAnyObjectByType<LevelOneCompletionManager>();
+        if (m1 != null)
         {
-            // casteo dinámico según tipo
-            if (manager is LevelOneCompletionManager m1) m1.RegisterMachineRepaired(transform);
-            else if (manager is LevelTwoCompletionManager m2) m2.RegisterMachineRepaired(transform);
-            /*else if (manager is LevelThreeCompletionManager m3) m3.RegisterMachineRepaired(transform);
-            else if (manager is LevelFourCompletionManager m4) m4.RegisterMachineRepaired(transform);
-            else if (manager is LevelFiveCompletionManager m5) m5.RegisterMachineRepaired(transform);*/
+            m1.RegisterMachineRepaired(transform);
+            return;
         }
 
-        Debug.Log($"[MachineInteraction] Máquina reparada: {gameObject.name}");
+        LevelTwoCompletionManager m2 = FindAnyObjectByType<LevelTwoCompletionManager>();
+        if (m2 != null)
+        {
+            m2.RegisterMachineRepaired(transform);
+            return;
+        }
+
+        LevelThreeCompletionManager m3 = FindAnyObjectByType<LevelThreeCompletionManager>();
+        if (m3 != null)
+        {
+            m3.RegisterMachineRepaired(transform);
+            return;
+        }
+
+        LevelFourCompletionManager m4 = FindAnyObjectByType<LevelFourCompletionManager>();
+        if (m4 != null)
+        {
+            m4.RegisterMachineRepaired(transform);
+            return;
+        }
+
+        Debug.LogWarning("[MachineInteraction] No se encontró manager de nivel.");
     }
 
     void OnDrawGizmosSelected()

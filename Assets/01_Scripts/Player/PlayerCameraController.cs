@@ -22,7 +22,10 @@ public class PlayerCameraController : MonoBehaviour
     public KeyCode switchViewKey = KeyCode.V;
     public bool startInThirdPerson = true;
 
-    [Header("Colisi�n C�mara")]
+    [Header("Pausa")]
+    public bool cameraPaused = false;
+
+    [Header("Colisión Cámara")]
     public float cameraCollisionRadius = 0.15f;
     public float minDistance = 0.25f;
     public LayerMask collisionMask;
@@ -45,6 +48,9 @@ public class PlayerCameraController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (cameraPaused)
+            return;
+
         HandleMouseLook();
         HandleViewSwitch();
         UpdateCameraPosition();

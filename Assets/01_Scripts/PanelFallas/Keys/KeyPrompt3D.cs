@@ -2,36 +2,41 @@ using UnityEngine;
 
 public class KeyPrompt3D : MonoBehaviour
 {
-    public KeyButtonController.KeySymbol keySymbol;
+    [Header("Tecla")]
+    public KeySymbolType keySymbol;
+
+    [Header("Renderer")]
     public Renderer targetRenderer;
 
     private Transform missPoint;
     private float moveSpeed;
     private KeyboardMinigameController controller;
-    private bool wasResolved = false;
+    private bool resolved = false;
 
     public void Init(
-        KeyButtonController.KeySymbol newSymbol,
-        Material visualMaterial,
-        Transform newMissPoint,
-        float newMoveSpeed,
-        KeyboardMinigameController newController)
+        KeySymbolType symbol,
+        Material material,
+        Transform targetMissPoint,
+        float speed,
+        KeyboardMinigameController owner
+    )
     {
-        keySymbol = newSymbol;
-        missPoint = newMissPoint;
-        moveSpeed = newMoveSpeed;
-        controller = newController;
+        keySymbol = symbol;
+        missPoint = targetMissPoint;
+        moveSpeed = speed;
+        controller = owner;
+        resolved = false;
 
         if (targetRenderer == null)
             targetRenderer = GetComponentInChildren<Renderer>();
 
-        if (targetRenderer != null && visualMaterial != null)
-            targetRenderer.material = visualMaterial;
+        if (targetRenderer != null && material != null)
+            targetRenderer.material = material;
     }
 
     void Update()
     {
-        if (wasResolved) return;
+        if (resolved) return;
         if (missPoint == null) return;
 
         transform.position = Vector3.MoveTowards(
@@ -40,8 +45,10 @@ public class KeyPrompt3D : MonoBehaviour
             moveSpeed * Time.deltaTime
         );
 
-        if (Vector3.Distance(transform.position, missPoint.position) <= 0.06f)
+        if (Vector3.Distance(transform.position, missPoint.position) <= 0.05f)
         {
+            resolved = true;
+
             if (controller != null)
                 controller.OnPromptMissed(this);
 
@@ -49,8 +56,11 @@ public class KeyPrompt3D : MonoBehaviour
         }
     }
 
-    public void MarkResolved()
+    public void Resolve()
     {
-        wasResolved = true;
+        if (resolved) return;
+
+        resolved = true;
+        Destroy(gameObject);
     }
 }
