@@ -5,6 +5,8 @@ public class LevelFiveIntro : MonoBehaviour
     public PlayerMovement playerMovement;
 
     public bool playIntroOnStart = true;
+    public KeyCode skipKey = KeyCode.Space;
+
     public float pausaEntreDialogos = 0.6f;
     public float extraSinAudio = 2.5f;
 
@@ -24,6 +26,9 @@ public class LevelFiveIntro : MonoBehaviour
     private string[] textos;
     private AudioClip[] audios;
 
+    private bool introActiva = false;
+    private bool introTerminada = false;
+
     void Start()
     {
         Time.timeScale = 1f;
@@ -40,7 +45,7 @@ public class LevelFiveIntro : MonoBehaviour
             "Las fallas no son accidentales.\nAlgo dentro del núcleo las está provocando.",
             "Cada sistema que repares...\nvolverá a fallar.",
             "No podrás estabilizar todo al mismo tiempo.",
-            "Debes decidir qué mantener activo y que dejar caer.",
+            "Debes decidir qué mantener activo y qué dejar caer.",
             "Ten cuidado, operador...\nel sistema está aprendiendo de ti."
         };
 
@@ -60,8 +65,21 @@ public class LevelFiveIntro : MonoBehaviour
             IniciarIntro();
     }
 
+    void Update()
+    {
+        if (!introActiva) return;
+
+        if (Input.GetKeyDown(skipKey))
+        {
+            TerminarIntro();
+        }
+    }
+
     public void IniciarIntro()
     {
+        if (introTerminada) return;
+
+        introActiva = true;
         pasoActual = 0;
 
         if (playerMovement != null)
@@ -72,6 +90,8 @@ public class LevelFiveIntro : MonoBehaviour
 
     void MostrarPasoActual()
     {
+        if (!introActiva) return;
+
         if (pasoActual >= textos.Length)
         {
             TerminarIntro();
@@ -83,14 +103,23 @@ public class LevelFiveIntro : MonoBehaviour
         if (dm != null)
             dm.ShowMessage(textos[pasoActual], audioActual);
 
-        float duracion = audioActual != null ? audioActual.length + pausaEntreDialogos : extraSinAudio;
+        float duracion = audioActual != null
+            ? audioActual.length + pausaEntreDialogos
+            : extraSinAudio;
 
         pasoActual++;
+
+        CancelInvoke(nameof(MostrarPasoActual));
         Invoke(nameof(MostrarPasoActual), duracion);
     }
 
     void TerminarIntro()
     {
+        if (introTerminada) return;
+
+        introActiva = false;
+        introTerminada = true;
+
         CancelInvoke(nameof(MostrarPasoActual));
 
         if (dm != null)
