@@ -42,7 +42,18 @@ public class Game : MonoBehaviour
 
     private bool completed = false;
     private bool initialized = false;
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip slideSound;
+    public AudioClip completeSound;
 
+    private void Awake() {
+        if (audioSource == null)
+                audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+    }
     void OnEnable()
     {
         InitPuzzle();
@@ -273,6 +284,7 @@ public class Game : MonoBehaviour
             Matrix[targetI, targetJ].CurrentI = targetI;
             Matrix[targetI, targetJ].CurrentJ = targetJ;
         }
+        audioSource.PlayOneShot(slideSound);
     }
 
     private void CheckPieceInput()
@@ -397,6 +409,7 @@ public class Game : MonoBehaviour
         gameState = GameState.End;
 
         Debug.Log("PUZZLE COMPLETADO");
+        audioSource.PlayOneShot(completeSound);
 
         Invoke(nameof(CompletePanel), closePanelDelay);
     }

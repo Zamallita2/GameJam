@@ -7,6 +7,10 @@ public class GearPanel : MonoBehaviour
     [Header("Engranajes")]
     public GearInteractable[] gearsInOrder;
     public int currentGear =0;
+    public float tiempo=1.2f;
+    private float timerWin=0;
+    private bool isWon=false;
+    private bool allActivated = false;
 
     [Header("Lamp")]
     public Renderer statusLamp;
@@ -25,6 +29,18 @@ public class GearPanel : MonoBehaviour
 
     public float ajustarX=-0.7f;
     public float ajustarY=-0.4f;
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+    public AudioClip completeSound;
+    private void Awake() {
+        if (audioSource == null)
+                audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
     void Start()
     {
@@ -55,6 +71,18 @@ public class GearPanel : MonoBehaviour
     }
     void Update()
     {
+        if (isWon)
+        {
+            if (timerWin == 0)
+            {
+                audioSource.PlayOneShot(completeSound);
+            }
+            if (timerWin>=tiempo)
+            {
+                PanelCompleted();
+            }
+            else timerWin+=Time.deltaTime;
+        }
         if (timer > 0.5 && !isMove)
         {
             transform.position += new Vector3(ajustarX,ajustarY, -0.11f);  
@@ -89,6 +117,7 @@ public class GearPanel : MonoBehaviour
         {
             gear.SetActivo();
             currentGear++;
+            audioSource.PlayOneShot(correctSound);
         }
         else
         {
@@ -97,6 +126,7 @@ public class GearPanel : MonoBehaviour
                 g.SetNormal();
             }
             currentGear = 0;
+            audioSource.PlayOneShot(wrongSound);
         }
 
         // comprobar si todos están activados
@@ -113,10 +143,10 @@ public class GearPanel : MonoBehaviour
 
         if (allActivated)
         {
-
-            PanelCompleted();
+            isWon=true;
             if (canvasPanel != null)
                 canvasPanel.SetGreen();
+
         }
     }
 

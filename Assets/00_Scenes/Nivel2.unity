@@ -2587,6 +2587,11 @@ MonoBehaviour:
   lineMaterial: {fileID: 2100000, guid: 64a582c1bbbb4dfb2a892901a4497810, type: 2}
   lineWidth: 0.01
   closePanelDelay: 1
+  audioSource: {fileID: 0}
+  wireSound: {fileID: 0}
+  connecSound: {fileID: 0}
+  errorSound: {fileID: 0}
+  completeSound: {fileID: 0}
 --- !u!1 &163952783
 GameObject:
   m_ObjectHideFlags: 0
@@ -2650,6 +2655,9 @@ MonoBehaviour:
   puzzleCamera: {fileID: 260399599}
   maxScreenClickDistance: 80
   closePanelDelay: 1
+  audioSource: {fileID: 0}
+  slideSound: {fileID: 0}
+  completeSound: {fileID: 0}
 --- !u!1001 &171388564
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17242,6 +17250,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowPlayer
   player: {fileID: 109638190}
+  alarmSource: {fileID: 0}
+  clockSource: {fileID: 0}
+  alarm: {fileID: 8300000, guid: d99f95cd7a9248f4e9c29d3a251731b5, type: 3}
+  clock1: {fileID: 8300000, guid: 4c085d8597389ef8a854dcec855c69fa, type: 3}
+  clock2: {fileID: 8300000, guid: 4cc84a21443c1f95cb256f3f863e12e6, type: 3}
+  volAlarm: 0.5
+  volClock1: 0.5
+  volClock2: 0.8
+  porcentajeBuscado: 0.9
 --- !u!114 &1105071174
 MonoBehaviour:
   m_ObjectHideFlags: 0
