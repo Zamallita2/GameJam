@@ -125,6 +125,12 @@ public class MachineInteraction : MonoBehaviour
         if (arrows != null)
             arrows.SetMachineOwner(this);
 
+        KeyboardMinigameController teclas = panelRoot.GetComponentInChildren<KeyboardMinigameController>(true);
+        if (teclas != null)
+            teclas.SetMachineOwner(this);
+
+   
+
         if (handManager != null)
         {
             if (panelHand != null && panelPointer != null)
@@ -222,6 +228,14 @@ public class MachineInteraction : MonoBehaviour
                 case MachineType.TipoMaquina.Arrows:
                     hud.CompleteArrows();
                     break;
+
+                case MachineType.TipoMaquina.Teclas:
+                    hud.CompleteTeclas();
+                    break;
+
+                case MachineType.TipoMaquina.Palancas:
+                    hud.CompletePalancas();
+                    break;
             }
         }
 
@@ -253,7 +267,28 @@ public class MachineInteraction : MonoBehaviour
             return;
         }
 
+        LevelFiveCompletionManager m5 = FindAnyObjectByType<LevelFiveCompletionManager>();
+        if (m5 != null)
+        {
+            m5.RegisterMachineRepaired(transform);
+            return;
+        }
+
         Debug.LogWarning("[MachineInteraction] No se encontró manager de nivel.");
+    }
+
+    public void ReactivarMaquina()
+    {
+        maquinaReparada = false;
+
+        if (machineGlow != null)
+            machineGlow.StartGlow();
+
+        MachineDialogueTrigger dialogueTrigger = GetComponent<MachineDialogueTrigger>();
+        if (dialogueTrigger != null)
+            dialogueTrigger.ResetTrigger();
+
+        Debug.Log("[MachineInteraction] Máquina volvió a fallar: " + gameObject.name);
     }
 
     void OnDrawGizmosSelected()

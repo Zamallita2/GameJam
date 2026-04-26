@@ -11,6 +11,8 @@ public class ObjectivesHUD : MonoBehaviour
     public TextMeshProUGUI puzzleText;
     public TextMeshProUGUI gearText;
     public TextMeshProUGUI arrowsText;
+    public TextMeshProUGUI keysText;
+    public TextMeshProUGUI palancasText;
 
     [Header("Colores")]
     public Color pendingColor = Color.white;
@@ -21,10 +23,12 @@ public class ObjectivesHUD : MonoBehaviour
         Instance = this;
 
         SetPending(botonesText, "Reparar módulo de memoria");
-        SetPending(cablesText, "Reconectar cables de energía");
-        SetPending(puzzleText, "Reconstruir identificación visual");
-        SetPending(gearText, "Acomodar engranajes del núcleo");
-        SetPending(arrowsText, "Restaurar respuesta rápida");
+        SetPending(cablesText, "Reconectar cables");
+        SetPending(puzzleText, "Reconstruir imagen");
+        SetPending(gearText, "Sincronizar engranajes");
+        SetPending(arrowsText, "Respuesta rápida");
+        SetPending(keysText, "Panel de teclas");
+        SetPending(palancasText, "Código de palancas");
     }
 
     void SetPending(TextMeshProUGUI text, string label)
@@ -41,28 +45,11 @@ public class ObjectivesHUD : MonoBehaviour
         text.color = completedColor;
     }
 
-    public void CompleteBotones()
-    {
-        SetCompleted(botonesText, "Reparar módulo de memoria");
-    }
-
-    public void CompleteCables()
-    {
-        SetCompleted(cablesText, "Reconectar cables de energía");
-    }
-
-    public void CompletePuzzle()
-    {
-        SetCompleted(puzzleText, "Reconstruir identificación visual");
-    }
-
-    public void CompleteGear()
-    {
-        SetCompleted(gearText, "Acomodar engranajes del núcleo");
-    }
-
-    public void CompleteArrows()
-    {
-        SetCompleted(arrowsText, "Restaurar respuesta rápida");
-    }
+    public void CompleteBotones() => SetCompleted(botonesText, "Reparar módulo de memoria");
+    public void CompleteCables() => SetCompleted(cablesText, "Reconectar cables");
+    public void CompletePuzzle() => SetCompleted(puzzleText, "Reconstruir imagen");
+    public void CompleteGear() => SetCompleted(gearText, "Sincronizar engranajes");
+    public void CompleteArrows() => SetCompleted(arrowsText, "Respuesta rápida");
+    public void CompleteTeclas() => SetCompleted(keysText, "Panel de teclas");
+    public void CompletePalancas() => SetCompleted(palancasText, "Código de palancas");
 }

@@ -106,6 +106,8 @@ public class KeyboardMinigameController : MonoBehaviour
 
     private bool isRunning = false;
     private bool isFinished = false;
+    private bool isRestarting = false;
+
     private Coroutine spawnRoutine;
     private MachineInteraction machineOwner;
 
@@ -136,7 +138,7 @@ public class KeyboardMinigameController : MonoBehaviour
 
     void Update()
     {
-        if (!isRunning || isFinished)
+        if (!isRunning || isFinished || isRestarting)
             return;
 
         currentTime -= Time.deltaTime;
@@ -171,6 +173,7 @@ public class KeyboardMinigameController : MonoBehaviour
 
         isRunning = true;
         isFinished = false;
+        isRestarting = false;
 
         if (keyLights != null)
             keyLights.TurnOffAll();
@@ -206,7 +209,7 @@ public class KeyboardMinigameController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
 
-        while (isRunning && !isFinished)
+        while (isRunning && !isFinished && !isRestarting)
         {
             if (activePrompts.Count < maxPromptsOnScreen)
                 SpawnRandomPrompt();
@@ -359,7 +362,7 @@ public class KeyboardMinigameController : MonoBehaviour
 
     public void OnPromptMissed(KeyPrompt3D prompt)
     {
-        if (!isRunning || isFinished)
+        if (!isRunning || isFinished || isRestarting)
             return;
 
         PlaySound(missSound);
@@ -369,19 +372,18 @@ public class KeyboardMinigameController : MonoBehaviour
 
         AddError();
 
-        if (keyLights != null)
-        {
-            keyLights.FlashError(KeySymbolType.A);
-            keyLights.FlashError(KeySymbolType.S);
-            keyLights.FlashError(KeySymbolType.D);
-            keyLights.FlashError(KeySymbolType.F);
-        }
+        // Ya NO brillan todas las teclas cuando se pierde un prompt.
     }
 
     void AddError()
     {
+        if (isFinished || isRestarting)
+            return;
+
         currentErrors++;
         currentScore = Mathf.Max(0, currentScore - penaltyOnMiss);
+
+        UpdateUI();
 
         if (currentErrors >= maxErrors)
             StartCoroutine(FailAndRestartRoutine());
@@ -389,12 +391,13 @@ public class KeyboardMinigameController : MonoBehaviour
 
     IEnumerator FailAndRestartRoutine()
     {
-        if (isFinished)
+        if (isFinished || isRestarting)
             yield break;
 
-        PlaySound(failSound);
-
+        isRestarting = true;
         isRunning = false;
+
+        PlaySound(failSound);
 
         if (spawnRoutine != null)
             StopCoroutine(spawnRoutine);
@@ -408,26 +411,20 @@ public class KeyboardMinigameController : MonoBehaviour
 
     IEnumerator WinRoutine()
     {
-        if (isFinished)
+        if (isFinished || isRestarting)
             yield break;
-
-        PlaySound(winSound);
 
         isFinished = true;
         isRunning = false;
+
+        PlaySound(winSound);
 
         if (spawnRoutine != null)
             StopCoroutine(spawnRoutine);
 
         ClearAllPrompts();
 
-        if (keyLights != null)
-        {
-            keyLights.Flash(KeySymbolType.A);
-            keyLights.Flash(KeySymbolType.S);
-            keyLights.Flash(KeySymbolType.D);
-            keyLights.Flash(KeySymbolType.F);
-        }
+        // Ya NO brillan todas las teclas al ganar.
 
         yield return new WaitForSeconds(closePanelDelay);
 

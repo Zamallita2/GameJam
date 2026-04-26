@@ -8,7 +8,9 @@ public class MachineDialogueTrigger : MonoBehaviour
         Cables,
         Puzzle,
         Gear,
-        Arrows
+        Arrows,
+        Teclas,
+        Palancas
     }
 
     [Header("Tipo de diálogo")]
@@ -29,6 +31,7 @@ public class MachineDialogueTrigger : MonoBehaviour
     private LevelTwoDialogueController levelTwoDialogue;
     private LevelThreeDialogueController levelThreeDialogue;
     private LevelFourDialogueController levelFourDialogue;
+    private LevelFiveDialogueController levelFiveDialogue;
 
     void Start()
     {
@@ -42,6 +45,7 @@ public class MachineDialogueTrigger : MonoBehaviour
         levelTwoDialogue = FindAnyObjectByType<LevelTwoDialogueController>();
         levelThreeDialogue = FindAnyObjectByType<LevelThreeDialogueController>();
         levelFourDialogue = FindAnyObjectByType<LevelFourDialogueController>();
+        levelFiveDialogue = FindAnyObjectByType<LevelFiveDialogueController>();
     }
 
     void BuscarPlayer()
@@ -76,6 +80,12 @@ public class MachineDialogueTrigger : MonoBehaviour
 
     void EjecutarDialogo()
     {
+        if (levelFiveDialogue != null)
+        {
+            EjecutarNivelCinco();
+            return;
+        }
+
         if (levelFourDialogue != null)
         {
             EjecutarNivelCuatro();
@@ -99,6 +109,9 @@ public class MachineDialogueTrigger : MonoBehaviour
             EjecutarNivelUno();
             return;
         }
+
+        if (mostrarLogs)
+            Debug.LogWarning("[MachineDialogueTrigger] No hay controlador de diálogos.");
     }
 
     void EjecutarNivelUno()
@@ -173,6 +186,28 @@ public class MachineDialogueTrigger : MonoBehaviour
 
             case MachineDialogueType.Arrows:
                 levelFourDialogue.ArrowsIntro();
+                break;
+        }
+    }
+
+    void EjecutarNivelCinco()
+    {
+        switch (type)
+        {
+            case MachineDialogueType.Botones:
+            case MachineDialogueType.Cables:
+            case MachineDialogueType.Puzzle:
+            case MachineDialogueType.Gear:
+            case MachineDialogueType.Arrows:
+                levelFiveDialogue.ModuloActivo();
+                break;
+
+            case MachineDialogueType.Teclas:
+                levelFiveDialogue.TeclasIntro();
+                break;
+
+            case MachineDialogueType.Palancas:
+                levelFiveDialogue.PalancasIntro();
                 break;
         }
     }

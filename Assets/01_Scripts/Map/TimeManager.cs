@@ -5,7 +5,7 @@ using TMPro;
 public class TimeManager : MonoBehaviour
 {
     public float timer = 0;
-    public float limitTime = 10;
+    public float limitTime = 130;
 
     public GameObject gameOverPanel;
     public GameObject gamePanel;
@@ -20,6 +20,8 @@ public class TimeManager : MonoBehaviour
 
     public void Iniciar()
     {
+        Time.timeScale = 1f;
+
         if (timerText != null)
         {
             textMaterial = Instantiate(timerText.fontMaterial);
@@ -27,6 +29,8 @@ public class TimeManager : MonoBehaviour
         }
 
         started = true;
+        timerPausado = false;
+        isGameOver = false;
     }
 
     void Update()
@@ -36,7 +40,14 @@ public class TimeManager : MonoBehaviour
         if (timerPausado) return;
 
         timer += Time.deltaTime;
+        UpdateTimerVisual();
 
+        if (timer >= limitTime)
+            GameOver();
+    }
+
+    void UpdateTimerVisual()
+    {
         float t = Mathf.Clamp01(timer / limitTime);
 
         Color currentColor = Color.Lerp(Color.green, Color.red, t);
@@ -57,11 +68,35 @@ public class TimeManager : MonoBehaviour
                 textMaterial.SetFloat("_GlowPower", Mathf.Lerp(0.3f, 0.8f, pulse));
             }
         }
+    }
+
+    public void PenalizarTiempo(float seconds)
+    {
+        if (!started || isGameOver) return;
+
+        timer += seconds;
+
+        Debug.Log("[TimeManager] Penalización: +" + seconds + " segundos");
+
+        UpdateTimerVisual();
 
         if (timer >= limitTime)
-        {
             GameOver();
-        }
+    }
+
+    public float GetTiempoRestante()
+    {
+        return Mathf.Max(0f, limitTime - timer);
+    }
+
+    public void Pausar()
+    {
+        timerPausado = true;
+    }
+
+    public void Reanudar()
+    {
+        timerPausado = false;
     }
 
     void GameOver()

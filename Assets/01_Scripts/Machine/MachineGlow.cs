@@ -59,4 +59,22 @@ public class MachineGlow : MonoBehaviour
 
         enabled = false;
     }
+
+    public void StartGlow()
+    {
+        reparada = false;
+        t = 0f;
+        direction = 1;
+
+        if (rend == null)
+            rend = GetComponentInChildren<Renderer>();
+
+        if (rend != null)
+        {
+            rend.material.EnableKeyword("_EMISSION");
+            rend.material.SetColor("_EmissionColor", glowColor * intensity);
+        }
+
+        enabled = true;
+    }
 }
