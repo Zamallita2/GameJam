@@ -17,23 +17,23 @@ public class LeverInteractable : MonoBehaviour
     public Material matActivo;
     private Renderer rend;
 
+    public AudioClip sonido;
+    private AudioSource audioSource;
+
     void Start()
     {
         rend = GetComponentInChildren<Renderer>();
         rotOff = transform.localRotation;
         rotOn = Quaternion.Euler(transform.localEulerAngles + new Vector3(-70f, 0f, 0f));
         if (matNormal != null) rend.material = matNormal;
-    }
-
-    void OnMouseDown()
-    {
-        if (isAnimating) return;
-        Toggle();
+        audioSource = GetComponentInParent<LeverPanel>().GetComponent<AudioSource>();
     }
 
     public void Toggle()
     {
         isActive = !isActive;
+        if (audioSource != null && sonido != null)
+            audioSource.PlayOneShot(sonido);
         StartCoroutine(AnimateLever());
         panel.OnLeverToggled();
     }

@@ -55,9 +55,9 @@ public class LeverPanel : MonoBehaviour
         if (CheckCombination())
         {
             solved = true;
-            Debug.Log("Combinacion correcta! Abriendo puerta...");
+            Debug.Log("Combinacion correcta!");
             if (door != null) door.Open();
-            else Debug.Log("DOOR ES NULL!");
+            else Debug.Log("ES NULL!");
         }
     }
 
