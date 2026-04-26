@@ -104,11 +104,14 @@ public class LevelFiveDialogueController : MonoBehaviour
     {
         Show("Operador...\nhas llegado demasiado lejos.", audioIntro2DemasiadoLejos);
     }
-
     public void Intro3NoAccidental()
     {
-        Show("Las fallas no son accidentales.", audioIntro3NoAccidental);
+        Show("Todos los modulos estana activos, pero el sistema ya no responde como antes.", audioIntro3NoAccidental);
     }
+  //  public void IntroNoAccidental()
+  //  {
+   //     Show("Las fallas no son accidentales.", audioIntro3NoAccidental);
+  //  }
 
     public void Intro4Refallas()
     {
